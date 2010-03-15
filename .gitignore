@@ -7,3 +7,5 @@ x-load*
 System.map
 include/asm/arch
 include/asm/proc
+include/config.h
+include/config.mk
