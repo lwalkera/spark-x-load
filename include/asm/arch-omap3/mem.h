@@ -69,6 +69,8 @@ typedef enum {
 
 #ifdef CONFIG_3430ZEBU
 #define SDP_SDRC_MDCFG_0_DDR	(0x02582019|B_ALL) /* Infin ddr module */
+#elif CONFIG_OMAP3_SPARKHW2
+#define SDP_SDRC_MDCFG_0_DDR	(0x02482019|B_ALL) /* Micron ddr chip */
 #else
 #define SDP_SDRC_MDCFG_0_DDR	(0x02584019|B_ALL) /* Infin ddr module */
 #endif
@@ -228,9 +230,17 @@ typedef enum {
 		| (MICRON_TRP_165 << 15) | (MICRON_TRCD_165 << 12) |(MICRON_TRRD_165 << 9) | \
 		(MICRON_TDPL_165 << 6) | (MICRON_TDAL_165))
 
+#ifdef CONFIG_OMAP3_SPARKHW2
+#define MICRON_TWTR_165   2
+#else
 #define MICRON_TWTR_165   1
+#endif
 #define MICRON_TCKE_165   1
+#ifdef CONFIG_OMAP3_SPARKHW2
+#define MICRON_TXP_165    1
+#else
 #define MICRON_TXP_165    5
+#endif
 #define MICRON_XSR_165    23
 #define MICRON_V_ACTIMB_165 ((MICRON_TCKE_165 << 12) | (MICRON_XSR_165 << 0)) | \
 				(MICRON_TXP_165 << 8) | (MICRON_TWTR_165 << 16)

@@ -238,14 +238,8 @@ void config_3430sdram_ddr(void)
 	__raw_writel(SDP_SDRC_MDCFG_0_DDR, SDRC_MCFG_0);
 
 	/* set timing */
-	if ((get_mem_type() == GPMC_ONENAND) || (get_mem_type() == MMC_ONENAND)) {
-		__raw_writel(INFINEON_SDRC_ACTIM_CTRLA_0, SDRC_ACTIM_CTRLA_0);
-		__raw_writel(INFINEON_SDRC_ACTIM_CTRLB_0, SDRC_ACTIM_CTRLB_0);
-	}
-	if ((get_mem_type() == GPMC_NAND) || (get_mem_type() == MMC_NAND)) {
-		__raw_writel(MICRON_SDRC_ACTIM_CTRLA_0, SDRC_ACTIM_CTRLA_0);
-		__raw_writel(MICRON_SDRC_ACTIM_CTRLB_0, SDRC_ACTIM_CTRLB_0);
-	}
+	__raw_writel(MICRON_SDRC_ACTIM_CTRLA_0, SDRC_ACTIM_CTRLA_0);
+	__raw_writel(MICRON_SDRC_ACTIM_CTRLB_0, SDRC_ACTIM_CTRLB_0);
 
 	__raw_writel(SDP_SDRC_RFR_CTRL, SDRC_RFR_CTRL);
 	__raw_writel(SDP_SDRC_POWER_POP, SDRC_POWER);
@@ -263,7 +257,6 @@ void config_3430sdram_ddr(void)
 	/* set up dll */
 	__raw_writel(SDP_SDRC_DLLAB_CTRL, SDRC_DLLA_CTRL);
 	delay(0x2000);	/* give time to lock */
-
 }
 #endif /* CFG_3430SDRAM_DDR */
 
@@ -858,7 +851,7 @@ int nand_init(void)
 	}
 	return 0;
 #endif
-	return 1;
+	return 0;
 }
 
 #if 0
