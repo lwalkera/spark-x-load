@@ -101,6 +101,7 @@ void start_armboot (void)
 	}
 #endif
 
+#ifdef ONENAND_START_BLOCK
 	if (buf == (uchar *)CFG_LOADADDR) {
 		/* if no u-boot on mmc, try onenand or nand, depending upon sysboot */
 		if (get_mem_type() == GPMC_ONENAND){
@@ -121,6 +122,7 @@ void start_armboot (void)
         		}
 		}
 	}
+#endif
 
 	/* if u-boot not found on mmc or
          * nand read result is erased data
