@@ -1,0 +1,9 @@
+*.o
+*.d
+*.a
+.*.swp
+.depend
+x-load*
+System.map
+include/asm/arch
+include/asm/proc
