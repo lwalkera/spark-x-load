@@ -150,7 +150,7 @@ fat_register_device(block_dev_desc_t *dev_desc, int part_no)
 		 * by using the get_partition_info routine. For this
 		 * purpose the libpart must be included.
 		 */
-		part_offset=63;
+		part_offset=56;
 		//part_offset=0;
 		cur_part = 1;
 #endif
