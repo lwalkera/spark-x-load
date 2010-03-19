@@ -26,17 +26,18 @@ include $(TOPDIR)/config.mk
 LIB	= lib$(CPU).a
 
 START	= start.o
+ASM		= cache.o
 OBJS	= cpu.o mmc.o gpio.o
 
 all:	.depend $(START) $(LIB)
 
-$(LIB):	$(OBJS)
-	$(AR) crv $@ $(OBJS)
+$(LIB):	$(OBJS) $(ASM)
+	$(AR) crv $@ $(OBJS) $(ASM)
 
 #########################################################################
 
-.depend:	Makefile $(START:.o=.S) $(OBJS:.o=.c)
-		$(CC) -M $(CFLAGS) $(START:.o=.S) $(OBJS:.o=.c) > $@
+.depend:	Makefile $(START:.o=.S) $(OBJS:.o=.c) $(ASM:.o=.S)
+		$(CC) -M $(CFLAGS) $(START:.o=.S) $(OBJS:.o=.c) $(ASM:.o=.S) > $@
 
 sinclude .depend
 
