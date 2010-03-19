@@ -34,6 +34,7 @@
 #include <part.h>
 #include <fat.h>
 #include <asm/arch/mem.h>
+#include <asm/string.h>
 
 const char version_string[] =
 	"Texas Instruments X-Loader 1.4.4ss (" __DATE__ " - " __TIME__ ")";
@@ -55,6 +56,9 @@ static int init_func_i2c (void)
 }
 
 typedef int (init_fnc_t) (void);
+#ifdef CONFIG_LOAD_LINUX
+uint * board_setup_atags();
+#endif
 
 init_fnc_t *init_sequence[] = {
 	cpu_init,		/* basic cpu dependent setup */
@@ -134,8 +138,17 @@ void start_armboot (void)
 		do_load_serial_bin(CFG_LOADADDR, 115200);
 	}
 
+#ifdef CONFIG_LOAD_LINUX
+	void	(*theKernel)(int zero, int arch, uint * params) = 
+		(void (*)(int, int, uint*))CFG_LOADADDR;
+
+	cleanup_before_linux();
+
+	theKernel(0, CONFIG_MACH_TYPE, board_setup_atags());
+#else
 	/* go run U-Boot and never return */
- 	((init_fnc_t *)CFG_LOADADDR)();
+	((init_fnc_t *)CFG_LOADADDR)();
+#endif
 
 	/* should never come here */
 }

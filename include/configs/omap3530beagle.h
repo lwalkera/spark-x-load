@@ -42,6 +42,9 @@
 
 #define CONFIG_BEAGLE_REV2	1
 
+#define CONFIG_ICACHE_OFF 1
+#define CONFIG_L2_OFF 1
+
 /* Enable the below macro if MMC boot support is required */
 #define CONFIG_MMC	1
 #if defined(CONFIG_MMC)
@@ -200,6 +203,13 @@
 #define ONENAND_END_BLOCK	6
 #define ONENAND_PAGE_SIZE	2048     /* 2KB */
 #define ONENAND_BLOCK_SIZE	0x20000  /* 128KB */
+
+/* Linux load info */
+#include "asm/mach-types.h"
+
+#define CONFIG_LOAD_LINUX		1
+#define CONFIG_MACH_TYPE		MACH_TYPE_OMAP3_BEAGLE
+#define CONFIG_ATAG_LOCATION	0x80000000
 
 #endif /* __CONFIG_H */
 
