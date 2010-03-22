@@ -9,3 +9,5 @@ include/asm/arch
 include/asm/proc
 include/config.h
 include/config.mk
+scripts/signgp
+tags

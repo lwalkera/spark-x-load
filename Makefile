@@ -80,7 +80,7 @@ SUBDIRS	=
 #########################################################################
 #########################################################################
 
-ALL = x-load.bin System.map
+ALL = x-load.bin.ift x-load.bin System.map
 
 all:		$(ALL)
 
@@ -93,7 +93,7 @@ x-load:	$(OBJS) $(LIBS) $(LDSCRIPT)
  		$(LD) $(LDFLAGS) $$UNDEF_SYM $(OBJS) \
 			--start-group $(LIBS) --end-group $(PLATFORM_LIBS) \
 			-Map x-load.map -o x-load
- 
+
 $(LIBS):
 		$(MAKE) -C `dirname $@`
 
@@ -105,6 +105,13 @@ System.map:	x-load
 
 oneboot:	x-load.bin
 		scripts/mkoneboot.sh
+
+x-load.bin.ift: scripts/signgp x-load.bin
+		scripts/signgp x-load.bin
+
+scripts/signgp: scripts/signgp.c
+		$(HOSTCC) -Wall $< -o $@
+
 
 #########################################################################
 else
@@ -166,6 +173,7 @@ clean:
 		\( -name 'core' -o -name '*.bak' -o -name '*~' \
 		-o -name '*.o'  -o -name '*.a'  \) -print \
 		| xargs rm -f
+	rm scripts/signgp
  
 clobber:	clean
 	find . -type f \
