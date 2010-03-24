@@ -44,6 +44,8 @@
 #define CONFIG_OMAP3503		1	/* which is in a 3503 */
 #define CONFIG_OMAP3_SPARKHW2	1	/* working with SPARKHW2 */
 
+#define CONFIG_ICACHE_OFF 1
+#define CONFIG_L2_OFF 1
 
 /* We always boot from MMC/eMMC */
 #define CONFIG_MMC	1
@@ -122,8 +124,15 @@
  */
 #define CONFIG_STACKSIZE	(128*1024) /* regular stack */
 
-
 #define GPMC_CONFIG 		(OMAP34XX_GPMC_BASE+0x50)
+
+/* Linux load info */
+#include "asm/mach-types.h"
+
+#define CONFIG_LOAD_LINUX		1
+#define CONFIG_MACH_TYPE		MACH_TYPE_SPARK_SLS_HW2
+#define CONFIG_ATAG_LOCATION	0x80000000
+
 
 #endif /* __CONFIG_H */
 
