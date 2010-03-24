@@ -39,6 +39,12 @@
 const char version_string[] =
 	"Texas Instruments X-Loader 1.4.4ss (" __DATE__ " - " __TIME__ ")";
 
+#ifdef CONFIG_LOAD_LINUX
+#define IMAGE_NAME	"zImage"
+#else
+#define IMAGE_NAME	"u-boot.bin"
+#endif
+
 int print_info(void)
 {
 #ifdef CFG_PRINTF
@@ -95,10 +101,11 @@ void start_armboot (void)
 #ifdef CONFIG_MMC
 	/* first try mmc */
 	if (mmc_init(1)) {
-		size = file_fat_read("u-boot.bin", buf, 0);
+		size = file_fat_read(IMAGE_NAME, buf, 0);
+
 		if (size > 0) {
 #ifdef CFG_PRINTF
-			printf("Loading u-boot.bin from mmc\n");
+			printf("Loading " IMAGE_NAME " from mmc\n");
 #endif
 			buf += size;
 		}
@@ -134,7 +141,7 @@ void start_armboot (void)
          */
 	first_instruction = (int *)CFG_LOADADDR;
 	if((buf == (uchar *)CFG_LOADADDR) || (*first_instruction == 0xffffffff)) {
-		printf("u-boot.bin not found or blank nand contents - attempting serial boot . . .\n");
+		printf(IMAGE_NAME " not found or blank nand contents - attempting serial boot . . .\n");
 		do_load_serial_bin(CFG_LOADADDR, 115200);
 	}
 
