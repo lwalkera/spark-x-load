@@ -767,10 +767,17 @@ void per_clocks_enable(void)
 	MUX_VAL(CP(MMC1_DAT1),      (IEN  | PTU | EN  | M0)) /*MMC1_DAT1*/\
 	MUX_VAL(CP(MMC1_DAT2),      (IEN  | PTU | EN  | M0)) /*MMC1_DAT2*/\
 	MUX_VAL(CP(MMC1_DAT3),      (IEN  | PTU | EN  | M0)) /*MMC1_DAT3*/\
-	MUX_VAL(CP(MMC1_DAT4),      (IEN  | PTU | EN  | M0)) /*MMC1_DAT4*/\
-	MUX_VAL(CP(MMC1_DAT5),      (IEN  | PTU | EN  | M0)) /*MMC1_DAT5*/\
-	MUX_VAL(CP(MMC1_DAT6),      (IEN  | PTU | EN  | M0)) /*MMC1_DAT6*/\
-	MUX_VAL(CP(MMC1_DAT7),      (IEN  | PTU | EN  | M0)) /*MMC1_DAT7*/\
+	\
+	MUX_VAL(CP(MMC2_CLK),       (IDIS | PTU | EN  | M0)) /*MMC2_CLK*/\
+	MUX_VAL(CP(MMC2_CMD),       (IEN  | PTU | EN  | M0)) /*MMC2_CMD*/\
+	MUX_VAL(CP(MMC2_DAT0),      (IEN  | PTU | EN  | M0)) /*MMC2_DAT0*/\
+	MUX_VAL(CP(MMC2_DAT1),      (IEN  | PTU | EN  | M0)) /*MMC2_DAT1*/\
+	MUX_VAL(CP(MMC2_DAT2),      (IEN  | PTU | EN  | M0)) /*MMC2_DAT2*/\
+	MUX_VAL(CP(MMC2_DAT3),      (IEN  | PTU | EN  | M0)) /*MMC2_DAT3*/\
+	MUX_VAL(CP(MMC2_DAT4),      (IEN  | PTU | EN  | M0)) /*MMC2_DAT4*/\
+	MUX_VAL(CP(MMC2_DAT5),      (IEN  | PTU | EN  | M0)) /*MMC2_DAT5*/\
+	MUX_VAL(CP(MMC2_DAT6),      (IEN  | PTU | EN  | M0)) /*MMC2_DAT6*/\
+	MUX_VAL(CP(MMC2_DAT7),      (IEN  | PTU | EN  | M0)) /*MMC2_DAT7*/\
 	/*UARTs*/\
 	MUX_VAL(CP(UART1_TX),       (IDIS | PTD | DIS | M0)) /*UART1_TX*/\
 	MUX_VAL(CP(UART1_RTS),      (IDIS | PTD | DIS | M0)) /*UART1_RTS*/\
