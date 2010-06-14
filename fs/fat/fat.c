@@ -53,7 +53,7 @@ static int cur_part = 1;
 #define DOS_PART_MAGIC_OFFSET	0x1fe
 #define DOS_FS_TYPE_OFFSET	0x52
 
-int strncmp(const char * cs,const char * ct,size_t count)
+static int strncmp(const char * cs,const char * ct,size_t count)
 {
         register signed char __res = 0;
 
@@ -66,7 +66,7 @@ int strncmp(const char * cs,const char * ct,size_t count)
         return __res;
 }
 
-char * strcpy(char * dest,const char *src)
+static char * strcpy(char * dest,const char *src)
 {
         char *tmp = dest;
 
@@ -75,7 +75,7 @@ char * strcpy(char * dest,const char *src)
         return tmp;
 }
 
-int strcmp(const char * cs,const char * ct)
+static int strcmp(const char * cs,const char * ct)
 {
         register signed char __res;
 
@@ -97,7 +97,7 @@ void * memcpy(void * dest,const void *src,size_t count)
 }
 
 
-int disk_read (__u32 startblock, __u32 getsize, __u8 * bufptr)
+static int disk_read (__u32 startblock, __u32 getsize, __u8 * bufptr)
 {
 	startblock += part_offset;
 	if (cur_dev == NULL)
@@ -149,6 +149,7 @@ fat_register_device(block_dev_desc_t *dev_desc, int part_no)
 		              buffer[DOS_PART_TBL_OFFSET+9] <<8  |
 		              buffer[DOS_PART_TBL_OFFSET+10]<<16 |
 		              buffer[DOS_PART_TBL_OFFSET+11]<<24;
+		FAT_DPRINT("Partition 1 starts at LBA %d\n", part_offset);
 
 		cur_part = 1;
 #endif
@@ -657,214 +658,211 @@ read_bootsectandvi(boot_sector *bs, volume_info *volinfo, int *fatsize)
 	return -1;
 }
 
-#if 0
-__u8 do_fat_read_block[MAX_CLUSTSIZE];  /* Block buffer */
-#endif
-
-__u8 *fnamecopy = 0x80500000;
-__u8 *do_fat_read_block = 0x80500880;
+char *fnamecopy = 0x80500000;
+__u8 *do_fat_read_block = 0x80500880; /* Block buffer */
 
 boot_sector bs;
 volume_info volinfo;
 fsdata datablock;
 
-long
+static long
 do_fat_read(const char *filename, void *buffer, unsigned long maxsize,
 	     int dols)
 {
 #if CONFIG_NIOS /* NIOS CPU cannot access big automatic arrays */
-    static
+	static
 #endif
-    fsdata *mydata = &datablock;
-    dir_entry *dentptr;
-    __u16 prevcksum = 0xffff;
-    char *subname = "";
-    int rootdir_size, cursect;
-    int idx, isdir = 0;
-    int files = 0, dirs = 0;
-    long ret = 0;
-    int firsttime;
+		fsdata *mydata = &datablock;
+	dir_entry *dentptr;
+	__u16 prevcksum = 0xffff;
+	char *subname = "";
+	int rootdir_size, cursect;
+	int idx, isdir = 0;
+	int files = 0, dirs = 0;
+	long ret = 0;
+	int firsttime;
 
-    if (read_bootsectandvi (&bs, &volinfo, &mydata->fatsize)) {
-	printf ("Error: reading boot sector\n");
-	return -1;
-    }
-    if (mydata->fatsize == 32) {
-	mydata->fatlength = bs.fat32_length;
-    } else {
-	mydata->fatlength = bs.fat_length;
-    }
-    mydata->fat_sect = bs.reserved;
-    cursect = mydata->rootdir_sect
-	    = mydata->fat_sect + mydata->fatlength * bs.fats;
-    mydata->clust_size = bs.cluster_size;
-    if (mydata->fatsize == 32) {
-	rootdir_size = mydata->clust_size;
-	mydata->data_begin = mydata->rootdir_sect   /* + rootdir_size */
-		- (mydata->clust_size * 2);
-    } else {
-	rootdir_size = ((bs.dir_entries[1] * (int) 256 + bs.dir_entries[0])
-			* sizeof (dir_entry)) / SECTOR_SIZE;
-	mydata->data_begin = mydata->rootdir_sect + rootdir_size
-		- (mydata->clust_size * 2);
-    }
-    mydata->fatbufnum = -1;
-
-    FAT_DPRINT ("FAT%d, fatlength: %d\n", mydata->fatsize,
-		mydata->fatlength);
-    FAT_DPRINT ("Rootdir begins at sector: %d, offset: %x, size: %d\n"
-		"Data begins at: %d\n",
-		mydata->rootdir_sect, mydata->rootdir_sect * SECTOR_SIZE,
-		rootdir_size, mydata->data_begin);
-    FAT_DPRINT ("Cluster size: %d\n", mydata->clust_size);
-
-    /* "cwd" is always the root... */
-    while (ISDIRDELIM (*filename))
-	filename++;
-    /* Make a copy of the filename and convert it to lowercase */
-    strcpy (fnamecopy, filename);
-    downcase (fnamecopy);
-    if (*fnamecopy == '\0') {
-	if (!dols){
-		printf("\n not there\n");
-	    return -1;
-	}
-	dols = LS_ROOT;
-    } else if ((idx = dirdelim (fnamecopy)) >= 0) {
-	isdir = 1;
-	fnamecopy[idx] = '\0';
-	subname = fnamecopy + idx + 1;
-	/* Handle multiple delimiters */
-	while (ISDIRDELIM (*subname))
-	    subname++;
-    } else if (dols) {
-	isdir = 1;
-    }
-
-    while (1) {
-	int i;
-
-	if (disk_read (cursect, mydata->clust_size, do_fat_read_block) < 0) {
-	    printf ("Error: reading rootdir block\n");
-	    return -1;
-	}
-	dentptr = (dir_entry *) do_fat_read_block;
-	for (i = 0; i < DIRENTSPERBLOCK; i++) {
-	    char s_name[14], l_name[256];
-
-	    l_name[0] = '\0';
-	    if ((dentptr->attr & ATTR_VOLUME)) {
-		    /* Volume label or VFAT entry */
-		    dentptr++;
-		    continue;
-	    } else if (dentptr->name[0] == 0) {
-		FAT_DPRINT ("RootDentname == NULL - %d\n", i);
-		if (dols == LS_ROOT) {
-		    printf ("\n%d file(s), %d dir(s)\n\n", files, dirs);
-		    return 0;
-		}
+	printf("Reading '%s'...\n", filename);
+	if (read_bootsectandvi (&bs, &volinfo, &mydata->fatsize)) {
+		printf ("Error: reading boot sector\n");
 		return -1;
-	    }
-#ifdef CONFIG_SUPPORT_VFAT
-	    else if (dols == LS_ROOT
-		     && mkcksum (dentptr->name) == prevcksum) {
-		dentptr++;
-		continue;
-	    }
-#endif
-	    get_name (dentptr, s_name);
-	    if (dols == LS_ROOT) {
-		int isdir = (dentptr->attr & ATTR_DIR);
-		char dirc;
-		int doit = 0;
-
-		if (isdir) {
-		    dirc = '/';
-		    if (s_name[0] != 0) {
-			dirs++;
-			doit = 1;
-		    }
-		} else {
-		    dirc = ' ';
-		    if (s_name[0] != 0) {
-			files++;
-			doit = 1;
-		    }
-		}
-		if (doit) {
-		    if (dirc == ' ') {
-			printf (" %8ld   %s%c\n",
-				(long) FAT2CPU32 (dentptr->size), s_name,
-				dirc);
-		    } else {
-			printf ("            %s%c\n", s_name, dirc);
-		    }
-		}
-		dentptr++;
-		continue;
-	    }
-	    if (strcmp (fnamecopy, s_name) && strcmp (fnamecopy, l_name)) {
-		FAT_DPRINT ("RootMismatch: |%s|%s|\n", s_name, l_name);
-		dentptr++;
-		continue;
-	    }
-	    if (isdir && !(dentptr->attr & ATTR_DIR))
-		return -1;
-
-	    FAT_DPRINT ("RootName: %s", s_name);
-	    FAT_DPRINT (", start: 0x%x", START (dentptr));
-	    FAT_DPRINT (", size:  0x%x %s\n",
-			FAT2CPU32 (dentptr->size), isdir ? "(DIR)" : "");
-
-	    goto rootdir_done;  /* We got a match */
 	}
-	cursect++;
-    }
-  rootdir_done:
-
-    firsttime = 1;
-    while (isdir) {
-	int startsect = mydata->data_begin
-		+ START (dentptr) * mydata->clust_size;
-	dir_entry dent;
-	char *nextname = NULL;
-
-	dent = *dentptr;
-	dentptr = &dent;
-	idx = dirdelim (subname);
-	if (idx >= 0) {
-	    subname[idx] = '\0';
-	    nextname = subname + idx + 1;
-	    /* Handle multiple delimiters */
-	    while (ISDIRDELIM (*nextname))
-		nextname++;
-	    if (dols && *nextname == '\0')
-		firsttime = 0;
+	if (mydata->fatsize == 32) {
+		mydata->fatlength = bs.fat32_length;
 	} else {
-	    if (dols && firsttime) {
-		firsttime = 0;
-	    } else {
-		isdir = 0;
-	    }
+		mydata->fatlength = bs.fat_length;
+	}
+	mydata->fat_sect = bs.reserved;
+	cursect = mydata->rootdir_sect
+		= mydata->fat_sect + mydata->fatlength * bs.fats;
+	mydata->clust_size = bs.cluster_size;
+	if (mydata->fatsize == 32) {
+		rootdir_size = mydata->clust_size;
+		mydata->data_begin = mydata->rootdir_sect   /* + rootdir_size */
+			- (mydata->clust_size * 2);
+	} else {
+		rootdir_size = ((bs.dir_entries[1] * (int) 256 + bs.dir_entries[0])
+				* sizeof (dir_entry)) / SECTOR_SIZE;
+		mydata->data_begin = mydata->rootdir_sect + rootdir_size
+			- (mydata->clust_size * 2);
+	}
+	mydata->fatbufnum = -1;
+
+	FAT_DPRINT ("FAT%d, fatlength: %d\n", mydata->fatsize,
+			mydata->fatlength);
+	FAT_DPRINT ("Rootdir begins at sector: %d, offset: %x, size: %d\n"
+			"Data begins at: %d\n",
+			mydata->rootdir_sect, mydata->rootdir_sect * SECTOR_SIZE,
+			rootdir_size, mydata->data_begin);
+	FAT_DPRINT ("Cluster size: %d\n", mydata->clust_size);
+
+	/* "cwd" is always the root... */
+	while (ISDIRDELIM (*filename))
+		filename++;
+	/* Make a copy of the filename and convert it to lowercase */
+	strcpy (fnamecopy, filename);
+	downcase (fnamecopy);
+	if (*fnamecopy == '\0') {
+		if (!dols){
+			printf("\nFilename is null, %s %s\n", filename, fnamecopy);
+			return -1;
+		}
+		dols = LS_ROOT;
+	} else if ((idx = dirdelim (fnamecopy)) >= 0) {
+		isdir = 1;
+		fnamecopy[idx] = '\0';
+		subname = fnamecopy + idx + 1;
+		/* Handle multiple delimiters */
+		while (ISDIRDELIM (*subname))
+			subname++;
+	} else if (dols) {
+		isdir = 1;
 	}
 
-	if (get_dentfromdir (mydata, startsect, subname, dentptr,
-			     isdir ? 0 : dols) == NULL) {
-	    if (dols && !isdir)
-		return 0;
-	    return -1;
-	}
+	while (1) {
+		int i;
 
-	if (idx >= 0) {
-	    if (!(dentptr->attr & ATTR_DIR))
-		return -1;
-	    subname = nextname;
-	}
-    }
-    ret = get_contents (mydata, dentptr, buffer, maxsize);
-    FAT_DPRINT ("Size: %d, got: %ld\n", FAT2CPU32 (dentptr->size), ret);
+		if (disk_read (cursect, mydata->clust_size, do_fat_read_block) < 0) {
+			printf ("Error: reading rootdir block\n");
+			return -1;
+		}
+		dentptr = (dir_entry *) do_fat_read_block;
+		for (i = 0; i < DIRENTSPERBLOCK; i++) {
+			char s_name[14], l_name[256];
 
-    return ret;
+			l_name[0] = '\0';
+			if ((dentptr->attr & ATTR_VOLUME)) {
+				/* Volume label or VFAT entry */
+				dentptr++;
+				continue;
+			} else if (dentptr->name[0] == 0) {
+				FAT_DPRINT ("RootDentname == NULL - %d\n", i);
+				if (dols == LS_ROOT) {
+					printf ("\n%d file(s), %d dir(s)\n\n", files, dirs);
+					return 0;
+				}
+				return -1;
+			}
+#ifdef CONFIG_SUPPORT_VFAT
+			else if (dols == LS_ROOT
+					&& mkcksum (dentptr->name) == prevcksum) {
+				dentptr++;
+				continue;
+			}
+#endif
+			get_name (dentptr, s_name);
+			if (dols == LS_ROOT) {
+				int isdir = (dentptr->attr & ATTR_DIR);
+				char dirc;
+				int doit = 0;
+
+				if (isdir) {
+					dirc = '/';
+					if (s_name[0] != 0) {
+						dirs++;
+						doit = 1;
+					}
+				} else {
+					dirc = ' ';
+					if (s_name[0] != 0) {
+						files++;
+						doit = 1;
+					}
+				}
+				if (doit) {
+					if (dirc == ' ') {
+						printf (" %8ld   %s%c\n",
+								(long) FAT2CPU32 (dentptr->size), s_name,
+								dirc);
+					} else {
+						printf ("            %s%c\n", s_name, dirc);
+					}
+				}
+				dentptr++;
+				continue;
+			}
+			if (strcmp (fnamecopy, s_name) && strcmp (fnamecopy, l_name)) {
+				FAT_DPRINT ("RootMismatch: |%s|%s|\n", s_name, l_name);
+				dentptr++;
+				continue;
+			}
+			if (isdir && !(dentptr->attr & ATTR_DIR))
+				return -1;
+
+			FAT_DPRINT ("RootName: %s", s_name);
+			FAT_DPRINT (", start: 0x%x", START (dentptr));
+			FAT_DPRINT (", size:  0x%x %s\n",
+					FAT2CPU32 (dentptr->size), isdir ? "(DIR)" : "");
+
+			goto rootdir_done;  /* We got a match */
+		}
+		cursect++;
+	}
+rootdir_done:
+
+	firsttime = 1;
+	while (isdir) {
+		int startsect = mydata->data_begin
+			+ START (dentptr) * mydata->clust_size;
+		dir_entry dent;
+		char *nextname = NULL;
+
+		dent = *dentptr;
+		dentptr = &dent;
+		idx = dirdelim (subname);
+		if (idx >= 0) {
+			subname[idx] = '\0';
+			nextname = subname + idx + 1;
+			/* Handle multiple delimiters */
+			while (ISDIRDELIM (*nextname))
+				nextname++;
+			if (dols && *nextname == '\0')
+				firsttime = 0;
+		} else {
+			if (dols && firsttime) {
+				firsttime = 0;
+			} else {
+				isdir = 0;
+			}
+		}
+
+		if (get_dentfromdir (mydata, startsect, subname, dentptr,
+					isdir ? 0 : dols) == NULL) {
+			if (dols && !isdir)
+				return 0;
+			return -1;
+		}
+
+		if (idx >= 0) {
+			if (!(dentptr->attr & ATTR_DIR))
+				return -1;
+			subname = nextname;
+		}
+	}
+	ret = get_contents (mydata, dentptr, buffer, maxsize);
+	FAT_DPRINT ("Size: %d, got: %ld\n", FAT2CPU32 (dentptr->size), ret);
+
+	return ret;
 }
 
 
@@ -881,7 +879,7 @@ file_fat_detectfs(void)
 		return 1;
 	}
 #if (CONFIG_COMMANDS & CFG_CMD_IDE) || (CONFIG_COMMANDS & CFG_CMD_SCSI) || \
-    (CONFIG_COMMANDS & CFG_CMD_USB) || (CONFIG_MMC)
+	(CONFIG_COMMANDS & CFG_CMD_USB) || (CONFIG_MMC)
 	printf("Interface:  ");
 	switch(cur_dev->if_type) {
 		case IF_TYPE_IDE :	printf("IDE"); break;
