@@ -256,10 +256,9 @@ get_fatent(fsdata *mydata, __u32 entry)
 	/* Read a new block of FAT entries into the cache. */
 	if (bufnum != mydata->fatbufnum) {
 		int getsize = FATBUFSIZE/FS_BLOCK_SIZE;
-		__u8 *bufptr = mydata->fatbuf;
+		__u8 *bufptr = (__u8 *)mydata->fatbuf;
 		__u32 fatlength = mydata->fatlength;
 		__u32 startblock = bufnum * FATBUFBLOCKS;
-		unsigned long i;
 
 		fatlength *= SECTOR_SIZE;	/* We want it in bytes now */
 		startblock += mydata->fat_sect;	/* Offset from start of disk */
@@ -487,7 +486,7 @@ static dir_entry *get_dentfromdir (fsdata * mydata, int startsect,
 				   char *filename, dir_entry * retdent,
 				   int dols)
 {
-
+	return 0;
 }
 
 #if 0
@@ -658,8 +657,8 @@ read_bootsectandvi(boot_sector *bs, volume_info *volinfo, int *fatsize)
 	return -1;
 }
 
-char *fnamecopy = 0x80500000;
-__u8 *do_fat_read_block = 0x80500880; /* Block buffer */
+char *fnamecopy = (char*)0x80500000;
+__u8 *do_fat_read_block = (__u8 *)0x80500880; /* Block buffer */
 
 boot_sector bs;
 volume_info volinfo;
