@@ -72,7 +72,7 @@
 
 #define MMC_CLOCK_REFERENCE		(96)
 #define MMC_RELATIVE_CARD_ADDRESS	(0x1234)
-#define MMC_INIT_SEQ_CLK		(MMC_CLOCK_REFERENCE * 1000 / 80)
+#define MMC_INIT_SEQ_CLK		(MMC_CLOCK_REFERENCE * 1000 / 200)
 #define MMC_400kHz_CLK			(MMC_CLOCK_REFERENCE * 1000 / 400)
 #define CLKDR(r, f, u)			((((r)*100) / ((f)*(u))) + 1)
 #define CLKD(f, u)			(CLKDR(MMC_CLOCK_REFERENCE, f, u))

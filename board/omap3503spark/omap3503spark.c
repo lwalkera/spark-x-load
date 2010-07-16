@@ -629,8 +629,8 @@ void per_clocks_enable(void)
 	sr32(CM_ICLKEN_WKUP, 0, 32, ICK_WKUP_ON);
 	sr32(CM_FCLKEN_DSS, 0, 32, FCK_DSS_ON);
 	sr32(CM_ICLKEN_DSS, 0, 32, ICK_DSS_ON);
-	sr32(CM_FCLKEN_CAM, 0, 32, FCK_CAM_ON);
-	sr32(CM_ICLKEN_CAM, 0, 32, ICK_CAM_ON);
+	//sr32(CM_FCLKEN_CAM, 0, 32, FCK_CAM_ON);
+	//sr32(CM_ICLKEN_CAM, 0, 32, ICK_CAM_ON);
 	sr32(CM_FCLKEN_PER, 0, 32, FCK_PER_ON);
 	sr32(CM_ICLKEN_PER, 0, 32, ICK_PER_ON);
 
@@ -760,24 +760,24 @@ void per_clocks_enable(void)
 	MUX_VAL(CP(DSS_DATA21),     (IDIS | PTD | DIS | M0)) /*DSS_DATA21*/\
 	MUX_VAL(CP(DSS_DATA22),     (IDIS | PTD | DIS | M0)) /*DSS_DATA22*/\
 	MUX_VAL(CP(DSS_DATA23),     (IDIS | PTD | DIS | M0)) /*DSS_DATA23*/\
-	/*MMC*/\
-	MUX_VAL(CP(MMC1_CLK),       (IDIS | PTU | EN  | M0)) /*MMC1_CLK*/\
-	MUX_VAL(CP(MMC1_CMD),       (IEN  | PTU | EN  | M0)) /*MMC1_CMD*/\
-	MUX_VAL(CP(MMC1_DAT0),      (IEN  | PTU | EN  | M0)) /*MMC1_DAT0*/\
-	MUX_VAL(CP(MMC1_DAT1),      (IEN  | PTU | EN  | M0)) /*MMC1_DAT1*/\
-	MUX_VAL(CP(MMC1_DAT2),      (IEN  | PTU | EN  | M0)) /*MMC1_DAT2*/\
-	MUX_VAL(CP(MMC1_DAT3),      (IEN  | PTU | EN  | M0)) /*MMC1_DAT3*/\
+	/*MMC - Note that CLK must be input to work*/\
+	MUX_VAL(CP(MMC1_CLK),       (IEN  | PTU | DIS | M0)) /*MMC1_CLK*/\
+	MUX_VAL(CP(MMC1_CMD),       (IEN  | PTU | DIS | M0)) /*MMC1_CMD*/\
+	MUX_VAL(CP(MMC1_DAT0),      (IEN  | PTU | DIS | M0)) /*MMC1_DAT0*/\
+	MUX_VAL(CP(MMC1_DAT1),      (IEN  | PTU | DIS | M0)) /*MMC1_DAT1*/\
+	MUX_VAL(CP(MMC1_DAT2),      (IEN  | PTU | DIS | M0)) /*MMC1_DAT2*/\
+	MUX_VAL(CP(MMC1_DAT3),      (IEN  | PTU | DIS | M0)) /*MMC1_DAT3*/\
 	\
-	MUX_VAL(CP(MMC2_CLK),       (IDIS | PTU | EN  | M0)) /*MMC2_CLK*/\
-	MUX_VAL(CP(MMC2_CMD),       (IEN  | PTU | EN  | M0)) /*MMC2_CMD*/\
-	MUX_VAL(CP(MMC2_DAT0),      (IEN  | PTU | EN  | M0)) /*MMC2_DAT0*/\
-	MUX_VAL(CP(MMC2_DAT1),      (IEN  | PTU | EN  | M0)) /*MMC2_DAT1*/\
-	MUX_VAL(CP(MMC2_DAT2),      (IEN  | PTU | EN  | M0)) /*MMC2_DAT2*/\
-	MUX_VAL(CP(MMC2_DAT3),      (IEN  | PTU | EN  | M0)) /*MMC2_DAT3*/\
-	MUX_VAL(CP(MMC2_DAT4),      (IEN  | PTU | EN  | M0)) /*MMC2_DAT4*/\
-	MUX_VAL(CP(MMC2_DAT5),      (IEN  | PTU | EN  | M0)) /*MMC2_DAT5*/\
-	MUX_VAL(CP(MMC2_DAT6),      (IEN  | PTU | EN  | M0)) /*MMC2_DAT6*/\
-	MUX_VAL(CP(MMC2_DAT7),      (IEN  | PTU | EN  | M0)) /*MMC2_DAT7*/\
+	MUX_VAL(CP(MMC2_CLK),       (IEN  | PTU | DIS | M0)) /*MMC2_CLK*/\
+	MUX_VAL(CP(MMC2_CMD),       (IEN  | PTU | DIS | M0)) /*MMC2_CMD*/\
+	MUX_VAL(CP(MMC2_DAT0),      (IEN  | PTU | DIS | M0)) /*MMC2_DAT0*/\
+	MUX_VAL(CP(MMC2_DAT1),      (IEN  | PTU | DIS | M0)) /*MMC2_DAT1*/\
+	MUX_VAL(CP(MMC2_DAT2),      (IEN  | PTU | DIS | M0)) /*MMC2_DAT2*/\
+	MUX_VAL(CP(MMC2_DAT3),      (IEN  | PTU | DIS | M0)) /*MMC2_DAT3*/\
+	MUX_VAL(CP(MMC2_DAT4),      (IEN  | PTU | DIS | M0)) /*MMC2_DAT4*/\
+	MUX_VAL(CP(MMC2_DAT5),      (IEN  | PTU | DIS | M0)) /*MMC2_DAT5*/\
+	MUX_VAL(CP(MMC2_DAT6),      (IEN  | PTU | DIS | M0)) /*MMC2_DAT6*/\
+	MUX_VAL(CP(MMC2_DAT7),      (IEN  | PTU | DIS | M0)) /*MMC2_DAT7*/\
 	/*UARTs*/\
 	MUX_VAL(CP(UART1_TX),       (IDIS | PTD | DIS | M0)) /*UART1_TX*/\
 	MUX_VAL(CP(UART1_RTS),      (IDIS | PTD | DIS | M0)) /*UART1_RTS*/\
@@ -919,7 +919,6 @@ void blinkLEDs()
 /* optionally do something like blinking LED */
 void board_hang(void)
 {
-	while (1);
 }
 
 /******************************************************************************

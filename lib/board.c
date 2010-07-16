@@ -87,6 +87,7 @@ void start_armboot (void)
 	uchar *buf;
 	int *first_instruction;
 	block_dev_desc_t *dev_desc = NULL;
+	volatile int j=1;
 
    	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr) {
 		if ((*init_fnc_ptr)() != 0) {
@@ -100,16 +101,22 @@ void start_armboot (void)
 
 #ifdef CONFIG_MMC
 	/* first try mmc */
-	if (mmc_init(1)) {
+	/* we use the "verbose" param of mmc_init to specifiy which mmc to try */
+	//while(j);
+	if (mmc_init(2) || mmc_init(1)) {
+#ifdef CFG_PRINTF
+		printf("Found mmc, loading " IMAGE_NAME "...");
+#endif
 		size = file_fat_read(IMAGE_NAME, buf, 0);
 
 		if (size > 0) {
 #ifdef CFG_PRINTF
-			printf("Loading " IMAGE_NAME " from mmc\n");
+			printf("Loaded " IMAGE_NAME " from mmc\n");
 #endif
 			buf += size;
 		}
 	}
+	//while(j);
 #endif
 
 #ifdef ONENAND_START_BLOCK

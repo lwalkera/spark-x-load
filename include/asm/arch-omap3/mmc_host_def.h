@@ -28,26 +28,30 @@
 /*
  * OMAP HSMMC register definitions
  */
-#define OMAP_HSMMC_SYSCONFIG	(*(volatile unsigned int *) 0x4809C010)
-#define OMAP_HSMMC_SYSSTATUS	(*(volatile unsigned int *) 0x4809C014)
-#define OMAP_HSMMC_CON		(*(volatile unsigned int *) 0x4809C02C)
-#define OMAP_HSMMC_BLK		(*(volatile unsigned int *) 0x4809C104)
-#define OMAP_HSMMC_ARG		(*(volatile unsigned int *) 0x4809C108)
-#define OMAP_HSMMC_CMD		(*(volatile unsigned int *) 0x4809C10C)
-#define OMAP_HSMMC_RSP10	(*(volatile unsigned int *) 0x4809C110)
-#define OMAP_HSMMC_RSP32	(*(volatile unsigned int *) 0x4809C114)
-#define OMAP_HSMMC_RSP54	(*(volatile unsigned int *) 0x4809C118)
-#define OMAP_HSMMC_RSP76	(*(volatile unsigned int *) 0x4809C11C)
-#define OMAP_HSMMC_DATA		(*(volatile unsigned int *) 0x4809C120)
-#define OMAP_HSMMC_PSTATE	(*(volatile unsigned int *) 0x4809C124)
-#define OMAP_HSMMC_HCTL		(*(volatile unsigned int *) 0x4809C128)
-#define OMAP_HSMMC_SYSCTL	(*(volatile unsigned int *) 0x4809C12C)
-#define OMAP_HSMMC_STAT		(*(volatile unsigned int *) 0x4809C130)
-#define OMAP_HSMMC_IE		(*(volatile unsigned int *) 0x4809C134)
-#define OMAP_HSMMC_CAPA		(*(volatile unsigned int *) 0x4809C140)
+#define OMAP_HSMMC_REGx(offset) (((volatile unsigned int *)cur_card_data.base)[offset/4])
+
+#define OMAP_HSMMC_SYSCONFIG	OMAP_HSMMC_REGx(0x010)
+#define OMAP_HSMMC_SYSSTATUS	OMAP_HSMMC_REGx(0x014)
+#define OMAP_HSMMC_CON			OMAP_HSMMC_REGx(0x02C)
+#define OMAP_HSMMC_BLK			OMAP_HSMMC_REGx(0x104)
+#define OMAP_HSMMC_ARG			OMAP_HSMMC_REGx(0x108)
+#define OMAP_HSMMC_CMD			OMAP_HSMMC_REGx(0x10C)
+#define OMAP_HSMMC_RSP10		OMAP_HSMMC_REGx(0x110)
+#define OMAP_HSMMC_RSP32		OMAP_HSMMC_REGx(0x114)
+#define OMAP_HSMMC_RSP54		OMAP_HSMMC_REGx(0x118)
+#define OMAP_HSMMC_RSP76		OMAP_HSMMC_REGx(0x11C)
+#define OMAP_HSMMC_DATA			OMAP_HSMMC_REGx(0x120)
+#define OMAP_HSMMC_PSTATE		OMAP_HSMMC_REGx(0x124)
+#define OMAP_HSMMC_HCTL			OMAP_HSMMC_REGx(0x128)
+#define OMAP_HSMMC_SYSCTL		OMAP_HSMMC_REGx(0x12C)
+#define OMAP_HSMMC_STAT			OMAP_HSMMC_REGx(0x130)
+#define OMAP_HSMMC_IE			OMAP_HSMMC_REGx(0x134)
+#define OMAP_HSMMC_CAPA			OMAP_HSMMC_REGx(0x140)
+#define OMAP_HSMMC_REV			OMAP_HSMMC_REGx(0x1FC)
 
 /* T2 Register definitions */
 #define CONTROL_DEV_CONF0	(*(volatile unsigned int *) 0x48002274)
+#define CONTROL_DEV_CONF1	(*(volatile unsigned int *) 0x480022D8)
 #define CONTROL_PBIAS_LITE	(*(volatile unsigned int *) 0x48002520)
 
 /*
@@ -99,6 +103,7 @@
 #define INDEX(i)			(i << 24)
 #define DATI_MASK			(0x1 << 1)
 #define DATI_CMDDIS			(0x1 << 1)
+#define CMDI				(1 << 0)
 #define DTW_1_BITMODE			(0x0 << 1)
 #define DTW_4_BITMODE			(0x1 << 1)
 #define SDBP_PWROFF			(0x0 << 8)
@@ -156,6 +161,7 @@ typedef struct {
 	unsigned int mode;
 	unsigned int size;
 	unsigned int RCA;
+	unsigned int base;
 } mmc_card_data;
 
 #define mmc_reg_out(addr, mask, val)\
