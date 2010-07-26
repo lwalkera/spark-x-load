@@ -379,8 +379,12 @@ get_contents(fsdata *mydata, dir_entry *dentptr, __u8 *buffer,
 	actsize=bytesperclust;
 	endclust=curclust;
 	do {
+		if(!(actsize/bytesperclust % 10))
+			serial_putc('.');
 		/* search for consecutive clusters */
 		while(actsize < filesize) {
+			if(!(actsize/bytesperclust % 10))
+				serial_putc('.');
 			newclust = get_fatent(mydata, endclust);
 			if((newclust -1)!=endclust)
 				goto getit;
@@ -601,7 +605,7 @@ read_bootsectandvi(boot_sector *bs, volume_info *volinfo, int *fatsize)
 	__u8 block[FS_BLOCK_SIZE];
 	volume_info *vistart;
 
-	printf("Reading boot sector\n");
+	FAT_DPRINT("Reading boot sector\n");
 
 	if (disk_read(0, 1, block) < 0) {
 		FAT_DPRINT("Error: reading block\n");
@@ -681,7 +685,7 @@ do_fat_read(const char *filename, void *buffer, unsigned long maxsize,
 	long ret = 0;
 	int firsttime;
 
-	printf("Reading '%s'...\n", filename);
+	FAT_DPRINT("Reading '%s'...", filename);
 	if (read_bootsectandvi (&bs, &volinfo, &mydata->fatsize)) {
 		printf ("Error: reading boot sector\n");
 		return -1;
@@ -858,7 +862,9 @@ rootdir_done:
 			subname = nextname;
 		}
 	}
+	printf("Found %s, reading...", filename);
 	ret = get_contents (mydata, dentptr, buffer, maxsize);
+	serial_putc('\n');
 	FAT_DPRINT ("Size: %d, got: %ld\n", FAT2CPU32 (dentptr->size), ret);
 
 	return ret;

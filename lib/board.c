@@ -102,21 +102,23 @@ void start_armboot (void)
 #ifdef CONFIG_MMC
 	/* first try mmc */
 	/* we use the "verbose" param of mmc_init to specifiy which mmc to try */
-	//while(j);
-	if (mmc_init(2) || mmc_init(1)) {
+	for(i=1;i<3;i++)
+	{
+		if (mmc_init(i)) {
 #ifdef CFG_PRINTF
-		printf("Found mmc, loading " IMAGE_NAME "...\n");
+			printf("Found mmc%d, looking for " IMAGE_NAME "...\n", i);
 #endif
-		size = file_fat_read(IMAGE_NAME, buf, 0);
+			size = file_fat_read(IMAGE_NAME, buf, 0);
 
-		if (size > 0) {
+			if (size > 0) {
 #ifdef CFG_PRINTF
-			printf("Loaded " IMAGE_NAME " from mmc\n");
+				printf("\nLoaded " IMAGE_NAME " from mmc\n");
 #endif
-			buf += size;
+				buf += size;
+				break;
+			}
 		}
 	}
-	//while(j);
 #endif
 
 #ifdef ONENAND_START_BLOCK
