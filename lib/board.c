@@ -1,4 +1,7 @@
 /*
+ * Copyright (C) 2010 PASCO scientific
+ * Laine Walker-Avina, lwalkera@pasco.com
+ *
  * Copyright (C) 2005 Texas Instruments.
  *
  * (C) Copyright 2004
@@ -37,7 +40,7 @@
 #include <asm/string.h>
 
 const char version_string[] =
-	"Texas Instruments X-Loader 1.4.4ss (" __DATE__ " - " __TIME__ ")";
+	"PASCO scientific OMAPload 1.0.0 (" __DATE__ " - " __TIME__ ")";
 
 #ifdef CONFIG_LOAD_LINUX
 #define IMAGE_NAME	"zImage"
