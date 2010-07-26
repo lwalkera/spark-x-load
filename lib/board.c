@@ -105,7 +105,7 @@ void start_armboot (void)
 	//while(j);
 	if (mmc_init(2) || mmc_init(1)) {
 #ifdef CFG_PRINTF
-		printf("Found mmc, loading " IMAGE_NAME "...");
+		printf("Found mmc, loading " IMAGE_NAME "...\n");
 #endif
 		size = file_fat_read(IMAGE_NAME, buf, 0);
 
