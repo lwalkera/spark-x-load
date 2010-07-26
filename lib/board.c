@@ -55,7 +55,7 @@ int print_info(void)
 
 static int init_func_i2c (void)
 {
-#ifdef CONFIG_MMC
+#if defined(CONFIG_MMC) && defined(CONFIG_DRIVER_OMAP34XX_I2C)
 	i2c_init (CFG_I2C_SPEED, CFG_I2C_SLAVE);
 #endif
 	return 0;
