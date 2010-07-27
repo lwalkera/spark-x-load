@@ -66,11 +66,44 @@ static const uint atags[] = {
 	5,ATAG_CORE,0,0,0,
 	3,ATAG_REVISION, 0x20,
 	4,ATAG_MEM,64*1024*1024,0x80000000,
-	0,ATAG_NONE};
+};
 
-uint * board_setup_atags(void)
+uint * board_setup_atags(char * cmdline)
 {
-	return memcpy((uchar*)CONFIG_ATAG_LOCATION, atags, sizeof(atags));
+	uint * tag_loc = (uint *)CONFIG_ATAG_LOCATION;
+	uint cmdline_len = 0;
+	char * temp;
+
+	/*
+	 * Copy premade tag block
+	 */
+	memcpy(tag_loc, atags, sizeof(atags));
+	tag_loc += sizeof(atags)/4;
+
+	if(cmdline)
+	{
+		/*
+		 * Calculate string length with null
+		 */
+		for(temp = cmdline; temp[0]; temp++, cmdline_len++);
+		cmdline_len++;
+
+		/*
+		 * Copy cmdline packed into 32-bit chunks
+		 */
+		tag_loc[0] = cmdline_len/4+3;
+		tag_loc[1] = ATAG_CMDLINE;
+		tag_loc += 2;
+		memcpy(tag_loc, cmdline, cmdline_len);
+		tag_loc += cmdline_len/4+1;
+	}
+	/*
+	 * The Terminator
+	 */
+	tag_loc[0] = 0;
+	tag_loc[1] = ATAG_NONE;
+
+	return (uint *)CONFIG_ATAG_LOCATION;
 }
 #endif
 

@@ -38,6 +38,9 @@
 #include <fat.h>
 #include <asm/arch/mem.h>
 #include <asm/string.h>
+#ifdef CONFIG_MMC
+#include <mmc.h>
+#endif
 
 const char version_string[] =
 	"PASCO scientific OMAPload 1.0.0 (" __DATE__ " - " __TIME__ ")";
@@ -66,7 +69,7 @@ static int init_func_i2c (void)
 
 typedef int (init_fnc_t) (void);
 #ifdef CONFIG_LOAD_LINUX
-uint * board_setup_atags();
+uint * board_setup_atags(char * cmdline);
 #endif
 
 init_fnc_t *init_sequence[] = {
@@ -89,8 +92,9 @@ void start_armboot (void)
  	int i, size;
 	uchar *buf;
 	int *first_instruction;
-	block_dev_desc_t *dev_desc = NULL;
-	volatile int j=1;
+#ifdef CONFIG_LOAD_LINUX
+	char *cmdline = CONFIG_ATAG_LOCATION + 0x1000;
+#endif
 
    	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr) {
 		if ((*init_fnc_ptr)() != 0) {
@@ -118,6 +122,16 @@ void start_armboot (void)
 				printf("\nLoaded " IMAGE_NAME " from mmc\n");
 #endif
 				buf += size;
+#ifdef CONFIG_LOAD_LINUX
+				size = file_fat_read("cmdline", cmdline, 0x800);
+				if(size > 0) {
+					cmdline[size] = 0;
+#ifdef CFG_PRINTF
+					printf("Loaded command line (%d bytes)\n", size);
+#endif
+				} else
+					cmdline = NULL;
+#endif
 				break;
 			}
 		}
@@ -163,7 +177,7 @@ void start_armboot (void)
 
 	cleanup_before_linux();
 
-	theKernel(0, CONFIG_MACH_TYPE, board_setup_atags());
+	theKernel(0, CONFIG_MACH_TYPE, board_setup_atags(cmdline));
 #else
 	/* go run U-Boot and never return */
 	((init_fnc_t *)CFG_LOADADDR)();
