@@ -773,14 +773,8 @@ void per_clocks_enable(void)
 	MUX_VAL(CP(GPMC_NADV_ALE),  (IDIS | PTD | DIS | M0)) /*GPMC_nADV_ALE*/\
 	MUX_VAL(CP(GPMC_NOE),       (IDIS | PTD | DIS | M0)) /*GPMC_nOE*/\
 	MUX_VAL(CP(GPMC_NWE),       (IDIS | PTD | DIS | M0)) /*GPMC_nWE*/\
-	MUX_VAL(CP(GPMC_NBE0_CLE),  (IEN  | PTD | DIS | M4)) /*GPIO_60*/\
-	MUX_VAL(CP(GPMC_NBE1),      (IEN  | PTD | DIS | M4)) /*GPIO_61*/\
 	MUX_VAL(CP(GPMC_NWP),       (IEN  | PTD | DIS | M4)) /*GPMC_nWP*/\
 	MUX_VAL(CP(GPMC_WAIT0),     (IEN  | PTU | EN  | M0)) /*GPMC_WAIT0*/\
-	MUX_VAL(CP(GPMC_WAIT1),     (IEN  | PTU | DIS | M4)) /*GPIO_63*/\
-	MUX_VAL(CP(GPMC_WAIT2),     (IEN  | PTU | DIS | M4)) /*GPIO_64*/\
-	MUX_VAL(CP(GPMC_WAIT3),     (IEN  | PTU | DIS | M4)) /*GPIO_65*/\
-	MUX_VAL(CP(CAM_WEN),        (IEN  | PTD | DIS | M4)) /*GPIO_167*/\
 	/*DSS*/\
 	MUX_VAL(CP(DSS_PCLK),       (IDIS | PTD | DIS | M0)) /*DSS_PCLK*/\
 	MUX_VAL(CP(DSS_HSYNC),      (IDIS | PTD | DIS | M0)) /*DSS_HSYNC*/\
@@ -831,10 +825,37 @@ void per_clocks_enable(void)
 	MUX_VAL(CP(UART3_RTS_SD),   (IDIS | PTD | DIS | M0)) /*UART3_RTS_SD */\
 	MUX_VAL(CP(UART3_RX_IRRX),  (IEN  | PTD | DIS | M0)) /*UART3_RX_IRRX*/\
 	MUX_VAL(CP(UART3_TX_IRTX),  (IDIS | PTD | DIS | M0)) /*UART3_TX_IRTX*/\
+	/*USB*/\
+	MUX_VAL(CP(HSUSB0_CLK),     (IEN  | PTD | EN  | M0)) /*HSUSB0_CLK*/\
+	MUX_VAL(CP(HSUSB0_STP),     (IEN  | PTD | EN  | M0)) /*HSUSB0_STP*/\
+	MUX_VAL(CP(HSUSB0_DIR),     (IEN  | PTD | EN  | M0)) /*HSUSB0_DIR*/\
+	MUX_VAL(CP(HSUSB0_NXT),     (IEN  | PTD | EN  | M0)) /*HSUSB0_NXT*/\
+	MUX_VAL(CP(HSUSB0_DATA0),   (IEN  | PTD | EN  | M0)) /*HSUSB0_DATA0*/\
+	MUX_VAL(CP(HSUSB0_DATA1),   (IEN  | PTD | EN  | M0)) /*HSUSB0_DATA1*/\
+	MUX_VAL(CP(HSUSB0_DATA2),   (IEN  | PTD | EN  | M0)) /*HSUSB0_DATA2*/\
+	MUX_VAL(CP(HSUSB0_DATA3),   (IEN  | PTD | EN  | M0)) /*HSUSB0_DATA3*/\
+	MUX_VAL(CP(HSUSB0_DATA4),   (IEN  | PTD | EN  | M0)) /*HSUSB0_DATA4*/\
+	MUX_VAL(CP(HSUSB0_DATA5),   (IEN  | PTD | EN  | M0)) /*HSUSB0_DATA5*/\
+	MUX_VAL(CP(HSUSB0_DATA6),   (IEN  | PTD | EN  | M0)) /*HSUSB0_DATA6*/\
+	MUX_VAL(CP(HSUSB0_DATA7),   (IEN  | PTD | EN  | M0)) /*HSUSB0_DATA7*/\
+	\
+	MUX_VAL(CP(ETK_D10_ES2),    (IEN  | PTD | DIS | M3)) /*HSUSB2_CLK*/\
+	MUX_VAL(CP(ETK_D11_ES2),    (IEN  | PTD | DIS | M3)) /*HSUSB2_STP*/\
+	MUX_VAL(CP(ETK_D12_ES2),    (IEN  | PTD | DIS | M3)) /*HSUSB2_DIR*/\
+	MUX_VAL(CP(ETK_D13_ES2),    (IEN  | PTD | DIS | M3)) /*HSUSB2_NXT*/\
+	MUX_VAL(CP(ETK_D14_ES2),    (IEN  | PTD | DIS | M3)) /*HSUSB2_DATA0*/\
+	MUX_VAL(CP(ETK_D15_ES2),    (IEN  | PTD | DIS | M3)) /*HSUSB2_DATA1*/\
+	MUX_VAL(CP(MCSPI1_CS3),     (IEN  | PTD | DIS | M3)) /*HSUSB2_DATA2*/\
+	MUX_VAL(CP(MCSPI2_CS1),     (IEN  | PTD | DIS | M3)) /*HSUSB2_DATA3*/\
+	MUX_VAL(CP(MCSPI2_SIMO),    (IEN  | PTD | DIS | M3)) /*HSUSB2_DATA4*/\
+	MUX_VAL(CP(MCSPI2_SOMI),    (IEN  | PTD | DIS | M3)) /*HSUSB2_DATA5*/\
+	MUX_VAL(CP(MCSPI2_CS0),     (IEN  | PTD | DIS | M3)) /*HSUSB2_DATA6*/\
+	MUX_VAL(CP(MCSPI2_CLK),     (IEN  | PTD | DIS | M3)) /*HSUSB2_DATA7*/\
 	/*I2C*/\
 	MUX_VAL(CP(I2C4_SCL),       (IEN  | PTU | EN  | M0)) /*I2C4_SCL*/\
 	MUX_VAL(CP(I2C4_SDA),       (IEN  | PTU | EN  | M0)) /*I2C4_SDA*/\
 	/*Misc System*/\
+	MUX_VAL(CP(SYS_OFF_MODE),   (IDIS | PTD | DIS | M0)) /*SYS_OFF_MODE*/\
 	MUX_VAL(CP(SYS_32K),        (IEN  | PTD | DIS | M0)) /*SYS_32K*/\
 	MUX_VAL(CP(SYS_BOOT0),      (IEN  | PTD | DIS | M4)) /*GPIO_2 */\
 	MUX_VAL(CP(SYS_BOOT1),      (IEN  | PTD | DIS | M4)) /*GPIO_3 */\
@@ -849,7 +870,9 @@ void per_clocks_enable(void)
 	MUX_VAL(CP(JTAG_TMS),       (IEN  | PTD | DIS | M0)) /*JTAG_TMS*/\
 	MUX_VAL(CP(JTAG_TDI),       (IEN  | PTD | DIS | M0)) /*JTAG_TDI*/\
 	MUX_VAL(CP(JTAG_EMU0),      (IEN  | PTD | DIS | M0)) /*JTAG_EMU0*/\
-	MUX_VAL(CP(JTAG_EMU1),      (IEN  | PTD | DIS | M0)) /*JTAG_EMU1*/
+	MUX_VAL(CP(JTAG_EMU1),      (IEN  | PTD | DIS | M0)) /*JTAG_EMU1*/\
+	MUX_VAL(CP(CAM_WEN),        (IEN  | PTD | DIS | M4)) /*GPIO_167*/\
+	MUX_VAL(CP(ETK_D7_ES2),     (IEN  | PTU | EN  | M4)) /*GPIO_21*/
 
 /**********************************************************
  * Routine: set_muxconf_regs
