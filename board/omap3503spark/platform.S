@@ -362,3 +362,25 @@ get_per_dpll_param:
 	adr r0, per_dpll_param
 	mov pc, lr
 
+/* PER2 DPLL values are same for both ES1 and ES2 */
+per2_dpll_param:
+/* m, n, fsel, m2 */
+/* 12MHz */
+.word 630,6,7,9
+
+/* 13MHz */
+.word 1200,12,4,10
+
+/* 19.2MHz */
+.word 750,11,6,10
+
+/* 26MHz /2*/
+.word 1200,12,4,10
+
+/* 38.4MHz /2*/
+.word 750,11,6,10
+
+.globl get_per2_dpll_param
+get_per2_dpll_param:
+	adr r0, per2_dpll_param
+	mov pc, lr

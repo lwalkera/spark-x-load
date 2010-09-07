@@ -55,6 +55,7 @@ extern dpll_param *get_mpu_dpll_param(void);
 extern dpll_param *get_iva_dpll_param(void);
 extern dpll_param *get_core_dpll_param(void);
 extern dpll_param *get_per_dpll_param(void);
+extern dpll_param *get_per2_dpll_param(void);
 
 #define __raw_readl(a)		(*(volatile unsigned int *)(a))
 #define __raw_writel(v, a)	(*(volatile unsigned int *)(a) = (v))
@@ -464,12 +465,24 @@ void prcm_init(void)
 	sr32(CM_CLKEN_PLL, 16, 3, PLL_LOCK);	/* lock mode */
 	wait_on_value(BIT1, 2, CM_IDLEST_CKGEN, LDELAY);
 
+	/* Getting the base address to PER2 DPLL param table */
+	dpll_param_p = (dpll_param *) get_per2_dpll_param();
+	/* Moving it to the right sysclk base */
+	dpll_param_p = dpll_param_p + clk_index;
+	/* PER2 DPLL (DPLL5) */
+	sr32(CM_CLKEN2_PLL, 0, 3, PLL_STOP);
+	wait_on_value(BIT0, 0, CM_IDLEST2_CKGEN, LDELAY);
+	sr32(CM_CLKSEL5_PLL, 0, 5, dpll_param_p->m2);	/* set M2 */
+	sr32(CM_CLKSEL4_PLL, 8, 11, dpll_param_p->m);	/* set m */
+	sr32(CM_CLKSEL4_PLL, 0, 7, dpll_param_p->n);	/* set n */
+	sr32(CM_CLKEN_PLL, 4, 4, dpll_param_p->fsel);	/* FREQSEL */
+	sr32(CM_CLKEN2_PLL, 0, 3, PLL_LOCK);	/* lock mode */
+	wait_on_value(BIT0, 1, CM_IDLEST2_CKGEN, LDELAY);
+
 	/* Getting the base address to MPU DPLL param table */
 	dpll_param_p = (dpll_param *) get_mpu_dpll_param();
-
 	/* Moving it to the right sysclk and ES rev base */
 	dpll_param_p = dpll_param_p + 3 * clk_index + sil_index;
-
 	/* MPU DPLL (unlocked already) */
 	sr32(CM_CLKSEL2_PLL_MPU, 0, 5, dpll_param_p->m2);	/* Set M2 */
 	sr32(CM_CLKSEL1_PLL_MPU, 8, 11, dpll_param_p->m);	/* Set M */
