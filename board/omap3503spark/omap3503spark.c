@@ -62,6 +62,8 @@ extern dpll_param *get_per2_dpll_param(void);
 #define __raw_readw(a)		(*(volatile unsigned short *)(a))
 #define __raw_writew(v, a)	(*(volatile unsigned short *)(a) = (v))
 
+#define HW(x) *((volatile unsigned int *)(x))
+
 #ifdef CONFIG_LOAD_LINUX
 static const uint atags[] = {
 	5,ATAG_CORE,0,0,0,
@@ -508,6 +510,9 @@ void prcm_init(void)
 	/* Set up GPTimers to sys_clk source only */
 	sr32(CM_CLKSEL_PER, 0, 8, 0xff);
 	sr32(CM_CLKSEL_WKUP, 0, 1, 1);
+
+	/* Setup CLKOUT2 for 24MHz from CM_96M_FCLK*/
+	HW(CM_CLKOUT_CTRL) = (1<<7) | (2<<3) | 2;
 
 	delay(5000);
 }
