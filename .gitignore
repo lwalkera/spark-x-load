@@ -3,6 +3,7 @@
 *.a
 .*.swp
 .depend
+MLO
 x-load*
 System.map
 include/asm/arch

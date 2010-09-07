@@ -80,7 +80,7 @@ SUBDIRS	=
 #########################################################################
 #########################################################################
 
-ALL = x-load.bin.ift x-load.bin System.map
+ALL = MLO x-load.bin System.map
 
 all:		$(ALL)
 
@@ -106,8 +106,9 @@ System.map:	x-load
 oneboot:	x-load.bin
 		scripts/mkoneboot.sh
 
-x-load.bin.ift: scripts/signgp x-load.bin
+MLO: scripts/signgp x-load.bin
 		scripts/signgp x-load.bin
+		mv x-load.bin.ift MLO
 
 scripts/signgp: scripts/signgp.c
 		$(HOSTCC) -Wall $< -o $@
