@@ -497,15 +497,8 @@ void prcm_init(void)
 	dpll_param_p = (dpll_param *) get_iva_dpll_param();
 	/* Moving it to the right sysclk and ES rev base */
 	dpll_param_p = dpll_param_p + 3 * clk_index + sil_index;
-	/* IVA DPLL (set to 12*20=240MHz) */
+	/* IVA DPLL */
 	sr32(CM_CLKEN_PLL_IVA2, 0, 3, PLL_STOP);
-	wait_on_value(BIT0, 0, CM_IDLEST_PLL_IVA2, LDELAY);
-	sr32(CM_CLKSEL2_PLL_IVA2, 0, 5, dpll_param_p->m2);	/* set M2 */
-	sr32(CM_CLKSEL1_PLL_IVA2, 8, 11, dpll_param_p->m);	/* set M */
-	sr32(CM_CLKSEL1_PLL_IVA2, 0, 7, dpll_param_p->n);	/* set N */
-	sr32(CM_CLKEN_PLL_IVA2, 4, 4, dpll_param_p->fsel);	/* FREQSEL */
-	sr32(CM_CLKEN_PLL_IVA2, 0, 3, PLL_LOCK);	/* lock mode */
-	wait_on_value(BIT0, 1, CM_IDLEST_PLL_IVA2, LDELAY);
 
 	/* Set up GPTimers to sys_clk source only */
 	sr32(CM_CLKSEL_PER, 0, 8, 0xff);
