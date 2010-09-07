@@ -119,7 +119,7 @@ void start_armboot (void)
 
 			if (size > 0) {
 #ifdef CFG_PRINTF
-				printf("\nLoaded " IMAGE_NAME " from mmc\n");
+				printf("\nLoaded " IMAGE_NAME " (%d bytes) from mmc\n", size);
 #endif
 				buf += size;
 #ifdef CONFIG_LOAD_LINUX
@@ -133,7 +133,8 @@ void start_armboot (void)
 					cmdline = NULL;
 #endif
 				break;
-			}
+			} else
+				printf(IMAGE_NAME " not found on mmc%d\n", i);
 		}
 	}
 #endif
@@ -171,6 +172,9 @@ void start_armboot (void)
 		do_load_serial_bin(CFG_LOADADDR, 115200);
 	}
 
+#ifdef CFG_PRINTF
+	printf("Booting " IMAGE_NAME "...\n");
+#endif
 #ifdef CONFIG_LOAD_LINUX
 	void	(*theKernel)(int zero, int arch, uint * params) = 
 		(void (*)(int, int, uint*))CFG_LOADADDR;
