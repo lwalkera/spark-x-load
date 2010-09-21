@@ -157,6 +157,14 @@ clbss_l:
 	add	r0, r0, #4		/* increment clear index pointer    */
 	bne	clbss_l                 /* keep clearing till at end        */
 
+copy_abort_vectors: /*copy exception handler addr to vector location at the end of SRAM */
+	ldr r0, _hang
+	ldr r1, =0x4020FFEC /* prefetch abort */
+	str r0, [r1]
+
+	ldr r1, =0x4020FFF0 /* data abort */
+	str r0, [r1]
+
 	ldr	pc, _start_armboot	/* jump to C code                   */
 
 _start_armboot:	.word start_armboot
