@@ -111,17 +111,12 @@ uint * board_setup_atags(char * cmdline)
 #endif
 
 /*******************************************************
- * Routine: delay
- * Description: spinning delay to use before udelay works
+ * spinning delay to use before udelay works
  ******************************************************/
-static inline void delay(unsigned long loops)
+inline void spin_delay(unsigned long loops)
 {
 	__asm__ volatile ("1:\n" "subs %0, %1, #1\n"
 			  "bne 1b":"=r" (loops):"0"(loops));
-}
-
-void udelay (unsigned long usecs) {
-	delay(usecs);
 }
 
 /*****************************************
@@ -296,7 +291,7 @@ void config_3430sdram_ddr(void)
 
 	/* init sequence for mDDR/mSDR using manual commands (DDR is different) */
 	__raw_writel(CMD_NOP, SDRC_MANUAL_0);
-	delay(5000);
+	spin_delay(5000);
 	__raw_writel(CMD_PRECHARGE, SDRC_MANUAL_0);
 	__raw_writel(CMD_AUTOREFRESH, SDRC_MANUAL_0);
 	__raw_writel(CMD_AUTOREFRESH, SDRC_MANUAL_0);
@@ -507,7 +502,7 @@ void prcm_init(void)
 	/* Setup CLKOUT2 for 24MHz from CM_96M_FCLK*/
 	HW(CM_CLKOUT_CTRL) = (1<<7) | (2<<3) | 2;
 
-	delay(5000);
+	spin_delay(5000);
 }
 
 /*****************************************
@@ -578,7 +573,7 @@ void s_init(void)
 #endif
 	try_unlock_memory();
 	set_muxconf_regs();
-	delay(100);
+	spin_delay(100);
 	prcm_init();
 	per_clocks_enable();
 	config_3430sdram_ddr();
@@ -682,7 +677,7 @@ void per_clocks_enable(void)
 	sr32(CM_FCLKEN_PER, 16, 1, 0x1);	/* FCKen GPIO5 */
 	sr32(CM_ICLKEN_PER, 16, 1, 0x1);	/* ICKen GPIO5 */
 
-	delay(1000);
+	spin_delay(1000);
 }
 
 /* Set MUX for UART, GPMC, SDRC, GPIO */
