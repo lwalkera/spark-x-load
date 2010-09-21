@@ -138,5 +138,12 @@
 #define CONFIG_SYS_PTV			2       /* Divisor: 2^(PTV+1) => 8 */
 #define CONFIG_SYS_HZ			1000
 
+/* EHCI USB Config */
+#define CONFIG_USB_EHCI 1
+#define CONFIG_USB_EHCI_OMAP3 1
+#define CONFIG_CMD_USB 1
+#define CONFIG_USB_STORAGE 1
+#define CONFIG_SYS_USB_EHCI_MAX_ROOT_PORTS 3
+
 #endif /* __CONFIG_H */
 
