@@ -205,8 +205,10 @@ struct gptimer {
 #define CM_CLKSEL1_PLL_MPU  0x48004940
 #define CM_CLKSEL2_PLL_MPU  0x48004944
 #define CM_FCLKEN1_CORE     0x48004a00
+#define CM_FCLKEN3_CORE		0x48004a08
 #define CM_ICLKEN1_CORE     0x48004a10
 #define CM_ICLKEN2_CORE     0x48004a14
+#define CM_ICLKEN3_CORE		0x48004a18
 #define CM_CLKSEL_CORE      0x48004a40
 #define CM_FCLKEN_GFX       0x48004b00
 #define CM_ICLKEN_GFX       0x48004b10
@@ -235,6 +237,8 @@ struct gptimer {
 #define CM_ICLKEN_PER       0x48005010
 #define CM_CLKSEL_PER       0x48005040
 #define CM_CLKSEL1_EMU      0x48005140
+#define CM_FCLKEN_USBHOST	0x48005400
+#define CM_ICLKEN_USBHOST	0x48005410
 
 #define PRM_CLKSEL           0x48306d40
 #define PRM_RSTCTRL          0x48307250

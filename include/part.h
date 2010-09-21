@@ -44,6 +44,8 @@ typedef struct block_dev_desc {
 				      unsigned long start,
 				      lbaint_t blkcnt,
 				      unsigned long *buffer);
+	unsigned long	(*block_write)(int device, unsigned long blknr,
+				unsigned long blkcnt, const void *buffer);
 }block_dev_desc_t;
 
 /* Interface types: */

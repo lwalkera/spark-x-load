@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2004
+# (C) Copyright 2000-2007
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
 #
 # See file CREDITS for list of people who contributed to this
@@ -23,27 +23,22 @@
 
 include $(TOPDIR)/config.mk
 
-LIB	= libcommon.a
+LIB	= libusb_host.a
 
-AOBJS	=
-
-COBJS = cmd_load.o
-COBJS += usb.o
-COBJS += usb_storage.o
-
-OBJS	= $(AOBJS) $(COBJS)
-
-CPPFLAGS += -I..
+# echi
+OBJS += ehci-omap3.o
+OBJS += ehci-hcd.o
 
 all:	$(LIB)
 
-$(LIB): .depend $(OBJS)
+$(LIB):	$(OBJS)
 	$(AR) crv $@ $(OBJS)
 
 #########################################################################
 
-.depend:	Makefile $(AOBJS:.o=.S) $(COBJS:.o=.c)
-		$(CC) -M $(CFLAGS) $(AOBJS:.o=.S) $(COBJS:.o=.c) > $@
+# defines $(obj).depend target
+.depend:	Makefile $(OBJS:.o=.c)
+	$(CC) -M $(CFLAGS) $(OBJS:.o=.c) > $@
 
 sinclude .depend
 
