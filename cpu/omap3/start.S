@@ -142,7 +142,7 @@ copy_loop:
 
 	/* Set up the stack						    */
 stack_setup:
-	ldr	r0, _TEXT_BASE		/* upper 128 KiB: relocated uboot   */
+	ldr	r0, =0x4020FCB0		/* upper 128 KiB: relocated uboot   */
 	sub	sp, r0, #128		/* leave 32 words for abort-stack   */
 	and	sp, sp, #~7		/* 8 byte alinged for (ldr/str)d    */
 
@@ -219,6 +219,6 @@ smi: 	.word 0xE1600070	@ Call SMI monitor
  */
  	.align  5
 do_hang:
-	ldr	sp, _TEXT_BASE		/* use 32 words abort stack */
+	ldr	sp, =0x4020FCB0		/* use 32 words abort stack */
    	bl	hang			/* hang and never return */
 
