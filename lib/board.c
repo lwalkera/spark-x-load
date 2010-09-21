@@ -75,6 +75,9 @@ uint * board_setup_atags(char * cmdline);
 init_fnc_t *init_sequence[] = {
 	cpu_init,		/* basic cpu dependent setup */
 	board_init,		/* basic board dependent setup */
+#ifdef CONFIG_TIMER
+	timer_init,
+#endif
 #ifdef CFG_NS16550_SERIAL
  	serial_init,		/* serial communications setup */
 #endif

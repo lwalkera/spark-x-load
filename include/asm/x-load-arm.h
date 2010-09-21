@@ -36,5 +36,11 @@
 extern ulong _armboot_start;	/* code start */
 extern ulong _bss_start;	/* code + data end == BSS start */
 extern ulong _bss_end;		/* BSS end */
-   
+
+void	reset_timer_masked	(void);
+ulong	get_timer_masked	(void);
+void	udelay_masked		(unsigned long usec);
+
+/* cpu/.../timer.c */
+int	timer_init		(void);
 #endif	/* _X_LOAD_ARM_H_ */

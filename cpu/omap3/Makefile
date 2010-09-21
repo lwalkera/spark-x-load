@@ -27,7 +27,7 @@ LIB	= lib$(CPU).a
 
 START	= start.o
 ASM		= cache.o
-OBJS	= cpu.o mmc.o gpio.o
+OBJS	= cpu.o mmc.o gpio.o timer.o
 
 all:	.depend $(START) $(LIB)
 

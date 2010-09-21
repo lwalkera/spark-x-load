@@ -29,20 +29,6 @@
 #define putc serial_putc
 #define tstc serial_tstc
 
-/*******************************************************
- * Routine: delay
- * Description: spinning delay to use before udelay works
- ******************************************************/
-static inline void delay(unsigned long loops)
-{
-	__asm__ volatile ("1:\n" "subs %0, %1, #1\n"
-			  "bne 1b":"=r" (loops):"0"(loops));
-}
-static inline void udelay(unsigned long us)
-{
-	delay(us * 200); /* approximate */
-}
-
 #ifdef CFG_CMD_FAT
 extern void * memcpy(void * dest,const void *src,size_t count);
 #else

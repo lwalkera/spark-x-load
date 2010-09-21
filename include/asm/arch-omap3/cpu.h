@@ -26,6 +26,31 @@
 #define  _OMAP34XX_CPU_H
 #include <asm/arch/omap3430.h>
 
+/* timer regs offsets (32 bit regs) */
+
+#ifndef __KERNEL_STRICT_NAMES
+#ifndef __ASSEMBLY__
+struct gptimer {
+	unsigned int tidr;	/* 0x00 r */
+	unsigned char res[0xc];
+	unsigned int tiocp_cfg;	/* 0x10 rw */
+	unsigned int tistat;	/* 0x14 r */
+	unsigned int tisr;	/* 0x18 rw */
+	unsigned int tier;	/* 0x1c rw */
+	unsigned int twer;	/* 0x20 rw */
+	unsigned int tclr;	/* 0x24 rw */
+	unsigned int tcrr;	/* 0x28 rw */
+	unsigned int tldr;	/* 0x2c rw */
+	unsigned int ttgr;	/* 0x30 rw */
+	unsigned int twpc;	/* 0x34 r*/
+	unsigned int tmar;	/* 0x38 rw*/
+	unsigned int tcar1;	/* 0x3c r */
+	unsigned int tcicr;	/* 0x40 rw */
+	unsigned int tcar2;	/* 0x44 r */
+} __attribute__ ((aligned(4), packed));
+#endif /* __ASSEMBLY__ */
+#endif /* __KERNEL_STRICT_NAMES */
+
 /* Register offsets of common modules */
 /* Control */
 #define CONTROL_STATUS		(OMAP34XX_CTRL_BASE + 0x2F0)
@@ -214,6 +239,12 @@
 #define PRM_CLKSEL           0x48306d40
 #define PRM_RSTCTRL          0x48307250
 #define PRM_CLKSRC_CTRL      0x48307270
+
+#define RESETDONE		(0x1 << 0)
+
+#define TCLR_ST			(0x1 << 0)
+#define TCLR_AR			(0x1 << 1)
+#define TCLR_PRE		(0x1 << 5)
 
 /* SMX-APE */
 #define PM_RT_APE_BASE_ADDR_ARM		(SMX_APE_BASE + 0x10000)
