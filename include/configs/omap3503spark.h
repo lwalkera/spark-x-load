@@ -57,10 +57,10 @@
 #include <asm/arch/cpu.h>        /* get chip and board defs */
 
 /* uncomment it if you need timer based udelay(). it takes about 250 bytes */
-//#define CFG_UDELAY
+#define CFG_UDELAY
 
 /* Clock Defines */
-#define V_OSCK	26000000  /* Clock output from T2 */
+#define V_OSCK	12000000  /* Clock output from T2 */
 
 #if (V_OSCK > 19200000)
 #define V_SCLK	(V_OSCK >> 1)
@@ -128,6 +128,15 @@
 #define CONFIG_MACH_TYPE		MACH_TYPE_SPARK_SLS_HW2
 #define CONFIG_ATAG_LOCATION	0x80000000
 
+/*
+ * OMAP3 has 12 GP timers, they can be driven by the system clock
+ * (12/13/16.8/19.2/38.4MHz) or by 32KHz clock. We use 13MHz (V_SCLK).
+ * This rate is divided by a local divisor.
+ */
+#define CONFIG_TIMER 1
+#define CONFIG_SYS_TIMERBASE		(OMAP34XX_GPT2)
+#define CONFIG_SYS_PTV			2       /* Divisor: 2^(PTV+1) => 8 */
+#define CONFIG_SYS_HZ			1000
 
 #endif /* __CONFIG_H */
 
