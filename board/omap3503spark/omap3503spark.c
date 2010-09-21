@@ -677,6 +677,14 @@ void per_clocks_enable(void)
 	sr32(CM_FCLKEN_PER, 16, 1, 0x1);	/* FCKen GPIO5 */
 	sr32(CM_ICLKEN_PER, 16, 1, 0x1);	/* ICKen GPIO5 */
 
+	/* Enable USBHOST clocks */
+	sr32(CM_ICLKEN_USBHOST, 0, 1, 1);
+	sr32(CM_FCLKEN_USBHOST, 0, 2, 3);
+
+	/* Enable USBTLL clocks */
+	sr32(CM_ICLKEN3_CORE, 2, 1, 1);
+	sr32(CM_FCLKEN3_CORE, 2, 1, 1);
+
 	spin_delay(1000);
 }
 
