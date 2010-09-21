@@ -34,6 +34,7 @@
 #include <asm/arch/cpu.h>
 #include <asm/arch/bits.h>
 #include <asm/arch/mux.h>
+#include <asm/arch/gpio.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/arch/sys_info.h>
 #include <asm/arch/clocks.h>
@@ -577,6 +578,15 @@ void s_init(void)
 	prcm_init();
 	per_clocks_enable();
 	config_3430sdram_ddr();
+
+	/*
+	omap_request_gpio(23);
+	omap_set_gpio_direction(23, 0);
+	omap_set_gpio_dataout(23, 0);
+	*/
+	omap_request_gpio(21);
+	omap_set_gpio_direction(21, 0);
+	omap_set_gpio_dataout(21, 1);
 }
 
 /*******************************************************
@@ -874,8 +884,9 @@ void per_clocks_enable(void)
 	MUX_VAL(CP(JTAG_TDI),       (IEN  | PTD | DIS | M0)) /*JTAG_TDI*/\
 	MUX_VAL(CP(JTAG_EMU0),      (IEN  | PTD | DIS | M0)) /*JTAG_EMU0*/\
 	MUX_VAL(CP(JTAG_EMU1),      (IEN  | PTD | DIS | M0)) /*JTAG_EMU1*/\
-	MUX_VAL(CP(CAM_WEN),        (IEN  | PTD | DIS | M4)) /*GPIO_167*/\
-	MUX_VAL(CP(ETK_D7_ES2),     (IEN  | PTU | EN  | M4)) /*GPIO_21*/
+	MUX_VAL(CP(CAM_WEN),        (IEN  | PTD | DIS | M4)) /*GPIO_167-P1*/\
+	MUX_VAL(CP(ETK_D9_ES2),     (IDIS | PTU | DIS | M4)) /*GPIO_23-Host_CSn*/\
+	MUX_VAL(CP(ETK_D7_ES2),     (IDIS | PTU | DIS | M4)) /*GPIO_21-RST_Host_n*/
 
 /**********************************************************
  * Routine: set_muxconf_regs
