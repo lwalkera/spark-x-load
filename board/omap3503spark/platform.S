@@ -366,7 +366,7 @@ get_per_dpll_param:
 per2_dpll_param:
 /* m, n, fsel, m2 */
 /* 12MHz */
-.word 630,6,7,9
+.word 50,4,0,1
 
 /* 13MHz */
 .word 1200,12,4,10
