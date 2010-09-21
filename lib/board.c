@@ -200,7 +200,7 @@ void hang (void)
 
 	/* if board_hang() returns, hang here */
 #ifdef CFG_PRINTF
-	printf("X-Loader hangs\n");
+	printf("\nOMAPload - Data/prefetch abort\n");
 #endif
 	for (;;);
 }
