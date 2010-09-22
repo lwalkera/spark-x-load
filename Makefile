@@ -109,7 +109,9 @@ oneboot:	x-load.bin
 
 MLO: scripts/signgp x-load.bin
 		scripts/signgp x-load.bin
-		mv x-load.bin.ift MLO
+		cp scripts/EMMC_raw_header.dat MLO
+		cat x-load.bin.ift >> MLO
+		rm x-load.bin.ift
 
 scripts/signgp: scripts/signgp.c
 		$(HOSTCC) -Wall $< -o $@
