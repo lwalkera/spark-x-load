@@ -41,6 +41,9 @@
 #ifdef CONFIG_MMC
 #include <mmc.h>
 #endif
+#ifdef CONFIG_USB_EHCI
+#include <usb.h>
+#endif
 
 const char version_string[] =
 	"PASCO scientific OMAPload 1.0.0 (" __DATE__ " - " __TIME__ ")";
@@ -140,6 +143,33 @@ void start_armboot (void)
 				printf(IMAGE_NAME " not found on mmc%d\n", i);
 		}
 	}
+#endif
+#ifdef CONFIG_USB_EHCI_OMAP3
+	usb_stop();
+	if(usb_init() >= 0 && usb_stor_scan(1) >= 0)
+	{
+		block_dev_desc_t * usb_blk_dev;
+		usb_blk_dev = usb_stor_get_dev(0);
+		fat_register_device(usb_blk_dev,1);
+
+		printf("Found USB, looking for " IMAGE_NAME "...\n");
+		size = file_fat_read(IMAGE_NAME, buf, 0);
+		if(size > 0) {
+			printf("\nLoaded " IMAGE_NAME " (%d bytes) from USB\n", size);
+			buf += size;
+#ifdef CONFIG_LOAD_LINUX
+			size = file_fat_read("cmdline", cmdline, 0x800);
+			if(size > 0) {
+				cmdline[size] = 0;
+				printf("Loaded command line (%d bytes)\n", size);
+			} else
+				cmdline = NULL;
+#endif
+		} else
+			printf("couldn't read\n");
+	}
+	/* reset USB controller to prepare for whoever uses it next */
+	usb_stop();
 #endif
 
 #ifdef ONENAND_START_BLOCK
