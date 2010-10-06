@@ -50,6 +50,7 @@ extern dpll_param *get_mpu_dpll_param(void);
 extern dpll_param *get_iva_dpll_param(void);
 extern dpll_param *get_core_dpll_param(void);
 extern dpll_param *get_per_dpll_param(void);
+extern dpll_param *get_per2_dpll_param(void);
 
 #define __raw_readl(a)		(*(volatile unsigned int *)(a))
 #define __raw_writel(v, a)	(*(volatile unsigned int *)(a) = (v))
@@ -61,12 +62,45 @@ const uint atags[] = {
 	5,ATAG_CORE,0,0,0,
 	3,ATAG_REVISION, 0x20,
 	4,ATAG_MEM,128*1024*1024,0x80000000,
-	4,ATAG_MEM,128*1024*1024,0x88000000,
-	0,ATAG_NONE};
+	4,ATAG_MEM,128*1024*1024,0x88000000
+};
 
-uint * board_setup_atags()
+uint * board_setup_atags(char * cmdline)
 {
-	return memcpy(CONFIG_ATAG_LOCATION, atags, sizeof(atags));
+	uint * tag_loc = (uint *)CONFIG_ATAG_LOCATION;
+	uint cmdline_len = 0;
+	char * temp;
+
+	/*
+	 * Copy premade tag block
+	 */
+	memcpy(tag_loc, atags, sizeof(atags));
+	tag_loc += sizeof(atags)/4;
+
+	if(cmdline)
+	{
+		/*
+		 * Calculate string length with null
+		 */
+		for(temp = cmdline; temp[0]; temp++, cmdline_len++);
+		cmdline_len++;
+
+		/*
+		 * Copy cmdline packed into 32-bit chunks
+		 */
+		tag_loc[0] = cmdline_len/4+3;
+		tag_loc[1] = ATAG_CMDLINE;
+		tag_loc += 2;
+		memcpy(tag_loc, cmdline, cmdline_len);
+		tag_loc += cmdline_len/4+1;
+	}
+	/*
+	 * The Terminator
+	 */
+	tag_loc[0] = 0;
+	tag_loc[1] = ATAG_NONE;
+
+	return (uint *)CONFIG_ATAG_LOCATION;
 }
 #endif
 
@@ -74,15 +108,18 @@ uint * board_setup_atags()
  * Routine: delay
  * Description: spinning delay to use before udelay works
  ******************************************************/
-static inline void delay(unsigned long loops)
+inline void spin_delay(unsigned long loops)
 {
 	__asm__ volatile ("1:\n" "subs %0, %1, #1\n"
 			  "bne 1b":"=r" (loops):"0"(loops));
 }
 
+#if 0
+/* EMEB - removed to avoid conflict w/ timer-based udelay */
 void udelay (unsigned long usecs) {
-	delay(usecs);
+	spin_delay(usecs);
 }
+#endif
 
 /*****************************************
  * Routine: board_init
@@ -269,7 +306,7 @@ void config_3430sdram_ddr(void)
 	/* init sequence for mDDR/mSDR using manual commands (DDR is different) */
 	//cs0
 	__raw_writel(CMD_NOP, SDRC_MANUAL_0);
-	delay(5000);
+	spin_delay(5000);
 	__raw_writel(CMD_PRECHARGE, SDRC_MANUAL_0);
 	__raw_writel(CMD_AUTOREFRESH, SDRC_MANUAL_0);
 	__raw_writel(CMD_AUTOREFRESH, SDRC_MANUAL_0);
@@ -279,7 +316,7 @@ void config_3430sdram_ddr(void)
 
 	//cs1
 	__raw_writel(CMD_NOP, SDRC_MANUAL_1);
-	delay(5000);
+	spin_delay(5000);
 	__raw_writel(CMD_PRECHARGE, SDRC_MANUAL_1);
 	__raw_writel(CMD_AUTOREFRESH, SDRC_MANUAL_1);
 	__raw_writel(CMD_AUTOREFRESH, SDRC_MANUAL_1);
@@ -453,6 +490,20 @@ void prcm_init(void)
 	sr32(CM_CLKEN_PLL, 16, 3, PLL_LOCK);	/* lock mode */
 	wait_on_value(BIT1, 2, CM_IDLEST_CKGEN, LDELAY);
 
+	/* Getting the base address to PER2 DPLL param table */
+	dpll_param_p = (dpll_param *) get_per2_dpll_param();
+	/* Moving it to the right sysclk base */
+	dpll_param_p = dpll_param_p + clk_index;
+	/* PER2 DPLL (DPLL5) */
+	sr32(CM_CLKEN2_PLL, 0, 3, PLL_STOP);
+	wait_on_value(BIT0, 0, CM_IDLEST2_CKGEN, LDELAY);
+	sr32(CM_CLKSEL5_PLL, 0, 5, dpll_param_p->m2);	/* set M2 */
+	sr32(CM_CLKSEL4_PLL, 8, 11, dpll_param_p->m);	/* set m */
+	sr32(CM_CLKSEL4_PLL, 0, 7, dpll_param_p->n);	/* set n */
+	sr32(CM_CLKEN_PLL, 4, 4, dpll_param_p->fsel);	/* FREQSEL */
+	sr32(CM_CLKEN2_PLL, 0, 3, PLL_LOCK);	/* lock mode */
+	wait_on_value(BIT0, 1, CM_IDLEST2_CKGEN, LDELAY);
+
 	/* Getting the base address to MPU DPLL param table */
 	dpll_param_p = (dpll_param *) get_mpu_dpll_param();
 
@@ -485,7 +536,7 @@ void prcm_init(void)
 	sr32(CM_CLKSEL_PER, 0, 8, 0xff);
 	sr32(CM_CLKSEL_WKUP, 0, 1, 1);
 
-	delay(5000);
+	spin_delay(5000);
 }
 
 /*****************************************
@@ -556,10 +607,16 @@ void s_init(void)
 #endif
 	try_unlock_memory();
 	set_muxconf_regs();
-	delay(100);
+	spin_delay(100);
 	prcm_init();
 	per_clocks_enable();
 	config_3430sdram_ddr();
+
+	/* USB PHY Reset - ball AD25 */
+	omap_request_gpio(147);
+	omap_set_gpio_direction(147, 0);
+	omap_set_gpio_dataout(147, 1);
+
 }
 
 /*******************************************************
@@ -660,7 +717,15 @@ void per_clocks_enable(void)
 	sr32(CM_FCLKEN_PER, 16, 1, 0x1);	/* FCKen GPIO5 */
 	sr32(CM_ICLKEN_PER, 16, 1, 0x1);	/* ICKen GPIO5 */
 
-	delay(1000);
+	/* Enable USBHOST clocks */
+	sr32(CM_ICLKEN_USBHOST, 0, 1, 1);
+	sr32(CM_FCLKEN_USBHOST, 0, 2, 3);
+
+	/* Enable USBTLL clocks */
+	sr32(CM_ICLKEN3_CORE, 2, 1, 1);
+	sr32(CM_FCLKEN3_CORE, 2, 1, 1);
+
+	spin_delay(1000);
 }
 
 /* Set MUX for UART, GPMC, SDRC, GPIO */
@@ -1041,7 +1106,7 @@ int nand_init(void)
 	 *  at other CS is done in u-boot. So we don't have to bother doing it here.
 	 */
 	__raw_writel(0 , GPMC_CONFIG7 + GPMC_CONFIG_CS0);
-	delay(1000);
+	spin_delay(1000);
 
 	if ((get_mem_type() == GPMC_NAND) || (get_mem_type() == MMC_NAND)) {
 		__raw_writel(M_NAND_GPMC_CONFIG1, GPMC_CONFIG1 + GPMC_CONFIG_CS0);
@@ -1055,7 +1120,7 @@ int nand_init(void)
 		__raw_writel((((OMAP34XX_GPMC_CS0_SIZE & 0xF)<<8) |
 			     ((NAND_BASE_ADR>>24) & 0x3F) |
 			     (1<<6)),  (GPMC_CONFIG7 + GPMC_CONFIG_CS0));
-		delay(2000);
+		spin_delay(2000);
 
 		if (nand_chip()) {
 #ifdef CFG_PRINTF
@@ -1078,7 +1143,7 @@ int nand_init(void)
 		__raw_writel((((OMAP34XX_GPMC_CS0_SIZE & 0xF)<<8) |
 			     ((ONENAND_BASE>>24) & 0x3F) |
 			     (1<<6)),  (GPMC_CONFIG7 + GPMC_CONFIG_CS0));
-		delay(2000);
+		spin_delay(2000);
 
 		if (onenand_chip()) {
 #ifdef CFG_PRINTF
@@ -1105,14 +1170,14 @@ void blinkLEDs()
 		*(unsigned long *)(p + 0x90) = 1 << (DEBUG_LED2 % 32);
 
 		/* delay for a while */
-		delay(1000);
+		spin_delay(1000);
 
 		/* turn LED1 off and LED2 on */
 		*(unsigned long *)(p + 0x90) = 1 << (DEBUG_LED1 % 32);
 		*(unsigned long *)(p + 0x94) = 1 << (DEBUG_LED2 % 32);
 
 		/* delay for a while */
-		delay(1000);
+		spin_delay(1000);
 	}
 }
 

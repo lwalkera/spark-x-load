@@ -60,7 +60,7 @@
 #include <asm/arch/cpu.h>        /* get chip and board defs */
 
 /* uncomment it if you need timer based udelay(). it takes about 250 bytes */
-//#define CFG_UDELAY
+#define CFG_UDELAY
  
 /* Clock Defines */
 #define V_OSCK	26000000  /* Clock output from T2 */
@@ -210,6 +210,23 @@
 #define CONFIG_LOAD_LINUX		1
 #define CONFIG_MACH_TYPE		MACH_TYPE_OMAP3_BEAGLE
 #define CONFIG_ATAG_LOCATION	0x80000000
+
+/*
+ * OMAP3 has 12 GP timers, they can be driven by the system clock
+ * (12/13/16.8/19.2/38.4MHz) or by 32KHz clock. We use 13MHz (V_SCLK).
+ * This rate is divided by a local divisor.
+ */
+#define CONFIG_TIMER 1
+#define CONFIG_SYS_TIMERBASE		(OMAP34XX_GPT2)
+#define CONFIG_SYS_PTV			2       /* Divisor: 2^(PTV+1) => 8 */
+#define CONFIG_SYS_HZ			1000
+
+/* EHCI USB Config */
+#define CONFIG_USB_EHCI 1
+#define CONFIG_USB_EHCI_OMAP3 1
+#define CONFIG_CMD_USB 1
+#define CONFIG_USB_STORAGE 1
+#define CONFIG_SYS_USB_EHCI_MAX_ROOT_PORTS 3
 
 #endif /* __CONFIG_H */
 
