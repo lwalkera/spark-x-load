@@ -25,7 +25,7 @@ main(int argc, char *argv[])
 
 	// Default to x-load.bin and 0x40200800.
 	strcpy(ifname, "x-load.bin");
-	loadaddr = 0x40200800;
+	loadaddr = 0x40200000;
 
 	if ((argc == 2) || (argc == 3))
 		strcpy(ifname, argv[1]);
