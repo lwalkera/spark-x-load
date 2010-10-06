@@ -557,6 +557,62 @@ void try_unlock_memory(void)
 	return;
 }
 
+
+/* DISPC Registers */
+struct dispc_regs {
+	u32 control;				/* 0x40 */
+	u32 config;					/* 0x44 */
+	u32 reserve_2;				/* 0x48 */
+	u32 default_color0;			/* 0x4C */
+	u32 default_color1;			/* 0x50 */
+	u32 trans_color0;			/* 0x54 */
+	u32 trans_color1;			/* 0x58 */
+	u32 line_status;			/* 0x5C */
+	u32 line_number;			/* 0x60 */
+	u32 timing_h;				/* 0x64 */
+	u32 timing_v;				/* 0x68 */
+	u32 pol_freq;				/* 0x6C */
+	u32 divisor;				/* 0x70 */
+	u32 global_alpha;			/* 0x74 */
+	u32 dig_size;				/* 0x78 */
+	u32 lcd_size;				/* 0x7C */
+} __attribute__((packed,aligned(4)));
+
+/* Few Register Offsets */
+#define FRAME_MODE_SHIFT			1
+#define TFTSTN_SHIFT				3
+#define DATALINES_SHIFT				8
+
+/* Enabling Display controller */
+#define LCD_ENABLE				1
+#define GO_LCD					(1 << 5)
+#define GP_OUT0					(1 << 15)
+#define GP_OUT1					(1 << 16)
+
+#define DISPC_ENABLE		(LCD_ENABLE | \
+							 GO_LCD | \
+							 GP_OUT0| \
+							 GP_OUT1)
+#define LCD_SIZE(w,h)		((h-1)<<16 | (w-1))
+
+void setup_dss(void)
+{
+	volatile register struct dispc_regs *dispc = 0x48050440;
+
+	dispc->timing_h = 0x04F02F1F;
+	dispc->timing_v = 0x00700303;
+	dispc->pol_freq = 0;
+	dispc->divisor = 0x00010003;
+	dispc->lcd_size = LCD_SIZE(640,480);
+	dispc->config = 0x00000204;
+	dispc->control = 0x308;
+	dispc->default_color0 = 0x0000a2de;
+	dispc->global_alpha = 0x000000ff;
+
+	dispc->control |= DISPC_ENABLE;
+}
+
+
 /**********************************************************
  * Routine: s_init
  * Description: Does early system init of muxing and clocks.
@@ -578,6 +634,8 @@ void s_init(void)
 	prcm_init();
 	per_clocks_enable();
 	config_3430sdram_ddr();
+
+	setup_dss();
 
 	/*
 	omap_request_gpio(23);
