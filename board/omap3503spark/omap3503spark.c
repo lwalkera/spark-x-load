@@ -638,11 +638,10 @@ void s_init(void)
 	setup_dss();
 
 	//Setup EHCI USB PHY and hub
-	/*
 	omap_request_gpio(23);
 	omap_set_gpio_direction(23, 0);
-	omap_set_gpio_dataout(23, 0);
-	*/
+	omap_set_gpio_dataout(23, 1);
+
 	omap_request_gpio(21);
 	omap_set_gpio_direction(21, 0);
 	omap_set_gpio_dataout(21, 1);
