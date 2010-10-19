@@ -150,6 +150,7 @@ void start_armboot (void)
 	 * sys_boot[5] was true when we reset */
 	if(*((volatile int *)CONTROL_STATUS) & (1<<5) || buf == CFG_LOADADDR)
 	{
+		unsigned char * usb_buf = CFG_LOADADDR;
 		usb_stop();
 		if(usb_init() >= 0 && usb_stor_scan(1) >= 0)
 		{
@@ -158,11 +159,10 @@ void start_armboot (void)
 			fat_register_device(usb_blk_dev,1);
 
 			printf("Found USB, looking for " IMAGE_NAME "...\n");
-			buf = CFG_LOADADDR;
-			size = file_fat_read(IMAGE_NAME, buf, 0);
+			size = file_fat_read(IMAGE_NAME, usb_buf, 0);
 			if(size > 0) {
 				printf("\nLoaded " IMAGE_NAME " (%d bytes) from USB\n", size);
-				buf += size;
+				usb_buf += size;
 #ifdef CONFIG_LOAD_LINUX
 				size = file_fat_read("cmdline", cmdline, 0x800);
 				if(size > 0) {
@@ -171,6 +171,7 @@ void start_armboot (void)
 				} else
 					cmdline = NULL;
 #endif
+				buf = usb_buf;
 			} else
 				printf("couldn't read\n");
 		}
