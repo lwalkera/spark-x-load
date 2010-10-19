@@ -118,6 +118,9 @@
 
 #define HW(x) *((volatile unsigned int *)(x))
 
+extern void board_ehci_stop(void);
+extern void board_ehci_init(void);
+
 #if 0
 static void omap_ehci_soft_phy_reset(u8 port)
 {
@@ -192,6 +195,7 @@ int ehci_hcd_init(void)
 	HW(OMAP3_EHCI_BASE+EHCI_INSNREG04) = EHCI_INSNREG04_DISABLE_UNSUSPEND;
 
 	//omap_ehci_soft_phy_reset(1);
+	board_ehci_init();
 
 	hccr = (struct ehci_hccr *)(OMAP3_EHCI_BASE);
 	hcor = (struct ehci_hcor *)(OMAP3_EHCI_BASE + 0x10);
@@ -221,6 +225,7 @@ int ehci_hcd_stop(void)
 	HW(OMAP3_USBTLL_BASE+SYSCONFIG) = 1<<1;
 	while (!(HW(OMAP3_USBTLL_BASE+SYSSTATUS) & (1 << 0)));
 
+	board_ehci_stop();
 	return 0;
 }
 #endif

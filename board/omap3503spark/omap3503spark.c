@@ -58,6 +58,8 @@ extern dpll_param *get_core_dpll_param(void);
 extern dpll_param *get_per_dpll_param(void);
 extern dpll_param *get_per2_dpll_param(void);
 
+#define GPIO_HUB_RESET			21
+#define GPIO_HOST_PHY_RESET		23
 #define __raw_readl(a)		(*(volatile unsigned int *)(a))
 #define __raw_writel(v, a)	(*(volatile unsigned int *)(a) = (v))
 #define __raw_readw(a)		(*(volatile unsigned short *)(a))
@@ -111,6 +113,31 @@ uint * board_setup_atags(char * cmdline)
 }
 #endif
 
+#ifdef CONFIG_USB_EHCI_OMAP3
+void board_ehci_init(void)
+{
+	//Setup EHCI USB PHY
+	omap_request_gpio(GPIO_HOST_PHY_RESET);
+	omap_set_gpio_direction(GPIO_HOST_PHY_RESET, 0);
+	omap_set_gpio_dataout(GPIO_HOST_PHY_RESET, 0);
+
+	//...and hub
+	omap_request_gpio(GPIO_HUB_RESET);
+	omap_set_gpio_direction(GPIO_HUB_RESET, 0);
+	omap_set_gpio_dataout(GPIO_HUB_RESET, 0);
+
+	udelay(55000);
+	omap_set_gpio_dataout(GPIO_HOST_PHY_RESET, 1);
+	udelay(1000);
+	omap_set_gpio_dataout(GPIO_HUB_RESET, 1);
+}
+void board_ehci_stop(void)
+{
+	//Hold hub and phy in reset
+	omap_set_gpio_dataout(GPIO_HUB_RESET, 0);
+	omap_set_gpio_dataout(GPIO_HOST_PHY_RESET, 0);
+}
+#endif
 /*******************************************************
  * spinning delay to use before udelay works
  ******************************************************/
@@ -636,15 +663,6 @@ void s_init(void)
 	config_3430sdram_ddr();
 
 	setup_dss();
-
-	//Setup EHCI USB PHY and hub
-	omap_request_gpio(23);
-	omap_set_gpio_direction(23, 0);
-	omap_set_gpio_dataout(23, 1);
-
-	omap_request_gpio(21);
-	omap_set_gpio_direction(21, 0);
-	omap_set_gpio_dataout(21, 1);
 }
 
 /*******************************************************
