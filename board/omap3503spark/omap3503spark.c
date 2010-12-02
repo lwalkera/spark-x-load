@@ -109,6 +109,13 @@ uint * board_setup_atags(char * cmdline)
 	tag_loc[0] = 0;
 	tag_loc[1] = ATAG_NONE;
 
+	HW(0x48004a10) |= 1<<4; //CM_FCLKEN3_CORE
+	HW(0x480ab404) = 2<<12 | 2<<3 | 1; //OTG_SYSCONFIG
+	HW(0x48004a10) &= ~(1<<4);
+
+
+	HW(0x48307260) = (1<<3) | (1<<2) ;
+
 	return (uint *)CONFIG_ATAG_LOCATION;
 }
 #endif
