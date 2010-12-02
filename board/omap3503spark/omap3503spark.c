@@ -983,6 +983,33 @@ void set_muxconf_regs(void)
 int nand_init(void)
 {
 	__raw_writel(0 , GPMC_CONFIG7 + GPMC_CONFIG_CS0);
+#ifdef CONFIG_TEST_RAM
+	{
+		unsigned int * ram = 0x80000000;
+		unsigned int count = 64*1024*1024/4;
+		int i;
+
+		printf("Testing SDRAM...\n");
+		for(i=0; i<count; i++)
+		{
+			if(!((i+1)%0x10000) || i==count-1)
+				printf("\rWriting   %08x/%08x",(i+1)*4,64*1024*1024);
+			ram[i] = i;
+		}
+		serial_putc('\n');
+		for(i=0; i<count; i++)
+		{
+			if(!((i+1)%0x10000) || i==count-1)
+				printf("\rVerifying %08x/%08x",(i+1)*4,64*1024*1024);
+			if(ram[i] != i)
+			{
+				printf("\n\x1b[0;30;41mFAILED\x1b[00m, error at %08x\n", i*4);
+				while(1);
+			}
+		}
+		printf("\n\x1b[0;30;42mPASSED\x1b[00m SDRAM Test\n");
+	}
+#endif
 #if 0
 	/* global settings */
 	__raw_writel(0x10, GPMC_SYSCONFIG);	/* smart idle */
