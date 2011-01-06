@@ -26,6 +26,7 @@
 #ifndef _USB_H_
 #define _USB_H_
 
+#include <common.h>
 #include <usb_defs.h>
 #include <usbdescriptors.h>
 #include <part.h>
@@ -34,7 +35,11 @@
 #define USB_ALTSETTINGALLOC		4
 #define USB_MAXALTSETTING		128	/* Hard limit */
 
+#ifdef CONFIG_USB_MAX_DEVICE
+#define USB_MAX_DEVICE			CONFIG_USB_MAX_DEVICE
+#else
 #define USB_MAX_DEVICE			4
+#endif
 #define USB_MAXCONFIG			8
 #define USB_MAXINTERFACES		8
 #define USB_MAXENDPOINTS		16

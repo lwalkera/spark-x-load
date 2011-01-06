@@ -67,7 +67,11 @@
 
 #define USB_BUFSIZ	512
 
+#ifdef CONFIG_USB_DEV_MANUAL_ADDRESS
+static struct usb_device * usb_dev = CONFIG_USB_DEV_MANUAL_ADDRESS;
+#else
 static struct usb_device usb_dev[USB_MAX_DEVICE];
+#endif
 static int dev_index;
 static int running;
 static int asynch_allowed;
