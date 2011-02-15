@@ -47,7 +47,7 @@
 #endif
 
 const char version_string[] =
-	"PASCO scientific OMAPload 1.0.1 (" __DATE__ " - " __TIME__ ")";
+	"PASCO scientific OMAPload 1.0.2 (" __DATE__ " - " __TIME__ ")";
 
 #ifdef CONFIG_LOAD_LINUX
 #define IMAGE_NAME	"zImage"
