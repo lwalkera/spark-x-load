@@ -916,10 +916,10 @@ void per_clocks_enable(void)
 	MUX_VAL(CP(UART1_TX),       (IDIS | PTD | DIS | M0)) /*UART1_TX*/\
 	MUX_VAL(CP(UART1_RTS),      (IDIS | PTD | DIS | M0)) /*UART1_RTS*/\
 	MUX_VAL(CP(UART1_CTS),      (IEN  | PTD | DIS | M0)) /*UART1_CTS*/\
-	MUX_VAL(CP(UART1_RX),       (IEN  | PTD | DIS | M0)) /*UART1_RX*/\
+	MUX_VAL(CP(UART1_RX),       (IEN  | PTD | EN  | M0)) /*UART1_RX*/\
 	MUX_VAL(CP(UART3_CTS_RCTX), (IEN  | PTD | EN  | M0)) /*UART3_CTS_RCTX */\
 	MUX_VAL(CP(UART3_RTS_SD),   (IDIS | PTD | DIS | M0)) /*UART3_RTS_SD */\
-	MUX_VAL(CP(UART3_RX_IRRX),  (IEN  | PTD | DIS | M0)) /*UART3_RX_IRRX*/\
+	MUX_VAL(CP(UART3_RX_IRRX),  (IEN  | PTD | EN  | M0)) /*UART3_RX_IRRX*/\
 	MUX_VAL(CP(UART3_TX_IRTX),  (IDIS | PTD | DIS | M0)) /*UART3_TX_IRTX*/\
 	/*USB*/\
 	MUX_VAL(CP(HSUSB0_CLK),     (IEN  | PTD | EN  | M0)) /*HSUSB0_CLK*/\
