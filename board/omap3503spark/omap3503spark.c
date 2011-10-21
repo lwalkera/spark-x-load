@@ -270,6 +270,18 @@ u32 cpu_is_3410(void)
 	}
 }
 
+#define CONTROL_IDCODE (0x4830a204)
+#define DM37x_ID (0x0B890000)
+
+u32 cpu_is_sitara(void)
+{
+	int status = __raw_readl(CONTROL_IDCODE) & 0x0fff0000;
+	if(status == DM37x_ID)
+		return 1;
+	else
+		return 0;
+}
+
 /*****************************************************************
  * sr32 - clear & set a value in a bit range for a 32 bit address
  *****************************************************************/
@@ -490,9 +502,20 @@ void prcm_init(void)
 	sr32(CM_CLKSEL_CAM, 0, 5, PER_M5X2);	/* set M5 */
 	sr32(CM_CLKSEL_DSS, 0, 5, PER_M4X2);	/* set M4 */
 	sr32(CM_CLKSEL_DSS, 8, 5, PER_M3X2);	/* set M3 */
-	sr32(CM_CLKSEL3_PLL, 0, 5, dpll_param_p->m2);	/* set M2 */
-	sr32(CM_CLKSEL2_PLL, 8, 11, dpll_param_p->m);	/* set m */
-	sr32(CM_CLKSEL2_PLL, 0, 7, dpll_param_p->n);	/* set n */
+	if(cpu_is_sitara())
+	{
+		/* Assuming 12MHz sys_clk */
+		sr32(CM_CLKSEL3_PLL, 0, 5,  9);	/* set M2 */
+		sr32(CM_CLKSEL2_PLL, 8, 12, 0x1b0);	/* set m */
+		sr32(CM_CLKSEL2_PLL, 0, 7,  5);	/* set n */
+		sr32(CM_CLKSEL2_PLL, 24, 8, 4); /* set ds */
+	}
+	else
+	{
+		sr32(CM_CLKSEL3_PLL, 0, 5, dpll_param_p->m2);	/* set M2 */
+		sr32(CM_CLKSEL2_PLL, 8, 11, dpll_param_p->m);	/* set m */
+		sr32(CM_CLKSEL2_PLL, 0, 7, dpll_param_p->n);	/* set n */
+	}
 	sr32(CM_CLKEN_PLL, 20, 4, dpll_param_p->fsel);	/* FREQSEL */
 	sr32(CM_CLKEN_PLL, 16, 3, PLL_LOCK);	/* lock mode */
 	wait_on_value(BIT1, 2, CM_IDLEST_CKGEN, LDELAY);
